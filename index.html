@@ -102,7 +102,7 @@
             transform: scale(1.5);
         }
 
-        /* --- Tarjeta Principal (Restaurada a Estática) --- */
+        /* --- Tarjeta Principal (Estática Elegante) --- */
         #main-content {
             opacity: 0;
             display: none;
@@ -150,11 +150,11 @@
             font-size: 3.5rem;
         }
 
-        /* --- Visualizador Trap Nation --- */
+        /* --- Visualizador Trap Nation Mejorado --- */
         .profile-container {
             position: relative;
-            width: 280px; 
-            height: 280px;
+            width: 350px; /* Tamaño aumentado para barras evidentes */
+            height: 350px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -239,6 +239,7 @@
 
         @media (max-width: 768px) {
             .img-left, .img-right { display: none; }
+            .profile-container { width: 280px; height: 280px; }
         }
     </style>
 </head>
@@ -333,7 +334,9 @@
             source = audioCtx.createMediaElementSource(audio);
             source.connect(analyser);
             analyser.connect(audioCtx.destination);
-            analyser.fftSize = 512;
+            
+            // Aumentar resolución para mayor detalle visual
+            analyser.fftSize = 1024;
             bufferLength = analyser.frequencyBinCount;
             dataArray = new Uint8Array(bufferLength);
             isInitialized = true;
@@ -355,49 +358,62 @@
 
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
-            const radius = 78; 
+            const innerRadius = 78; // Justo en el borde de la foto
             
+            // Detección de bajos profundos
             let bass = 0;
-            for(let i=0; i<10; i++) bass += dataArray[i];
-            bass = bass / 10;
+            for(let i=0; i<15; i++) bass += dataArray[i];
+            bass = bass / 15;
             
-            // Pulso de la foto
-            profileWrapper.style.transform = `scale(${1 + (bass / 400)})`;
+            // Pulso evidente en la foto
+            const picPulse = 1 + (bass / 350);
+            profileWrapper.style.transform = `scale(${picPulse})`;
 
-            // Visualizador circular (Trap Nation Style)
-            const barCount = 100;
+            // Dibujo de barras Trap Nation HD
+            const barCount = 140;
             const step = (Math.PI * 2) / barCount;
             
             for (let i = 0; i < barCount; i++) {
-                const index = Math.floor((i / barCount) * bufferLength * 0.6);
-                const barHeight = (dataArray[index] / 255) * 60;
+                // Mapeo de frecuencias logarítmicas para mejor visualización
+                const index = Math.floor(Math.pow(i / barCount, 1.5) * bufferLength * 0.8);
+                const val = dataArray[index];
+                
+                // Barras mucho más largas y reactivas
+                const barHeight = (val / 255) * 90;
                 const angle = i * step - Math.PI/2;
                 
-                // Degradado basado en el video Trap Nation
-                const hue = (i * (360/barCount) + Date.now()/40) % 360;
-                ctx.strokeStyle = `hsla(${hue}, 100%, 70%, 0.8)`;
-                ctx.lineWidth = 3;
+                // Color dinámico vibrante
+                const hue = (i * (360/barCount) + Date.now()/50) % 360;
+                const sat = 80 + (val/255) * 20;
+                const light = 60 + (val/255) * 15;
+
+                ctx.strokeStyle = `hsla(${hue}, ${sat}%, ${light}%, 0.9)`;
+                ctx.lineWidth = 4;
                 ctx.lineCap = 'round';
 
-                const xStart = centerX + Math.cos(angle) * radius;
-                const yStart = centerY + Math.sin(angle) * radius;
-                const xEnd = centerX + Math.cos(angle) * (radius + barHeight);
-                const yEnd = centerY + Math.sin(angle) * (radius + barHeight);
+                // Líneas del ecualizador saliendo hacia afuera
+                const xStart = centerX + Math.cos(angle) * innerRadius;
+                const yStart = centerY + Math.sin(angle) * innerRadius;
+                const xEnd = centerX + Math.cos(angle) * (innerRadius + barHeight);
+                const yEnd = centerY + Math.sin(angle) * (innerRadius + barHeight);
 
                 ctx.beginPath();
                 ctx.moveTo(xStart, yStart);
                 ctx.lineTo(xEnd, yEnd);
                 ctx.stroke();
 
-                ctx.shadowBlur = 10;
-                ctx.shadowColor = `hsla(${hue}, 100%, 60%, 0.5)`;
+                // Efecto de brillo (Glow) evidente
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = `hsla(${hue}, 100%, 60%, 0.6)`;
             }
         }
 
         function startExperience() {
             initAudio();
             audioCtx.resume();
-            audio.play().catch(() => {});
+            audio.play().catch(() => {
+                console.log("Audio play failed - ensure musica.mp3 exists");
+            });
             document.getElementById('intro-overlay').classList.add('fade-out');
             setTimeout(() => {
                 document.getElementById('main-content').classList.add('visible');
