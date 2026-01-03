@@ -45,7 +45,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 0 50px rgba(255, 255, 255, 0.05);
+            box-shadow: 0 0 70px rgba(255, 255, 255, 0.08);
             transition: transform 0.05s linear;
         }
 
@@ -85,8 +85,8 @@
             transition: opacity 0.1s, transform 0.1s;
         }
 
-        .rgb-cyan { background: rgba(0, 255, 255, 0.15); filter: blur(10px); }
-        .rgb-red { background: rgba(255, 0, 0, 0.15); filter: blur(10px); }
+        .rgb-cyan { background: rgba(0, 255, 255, 0.2); filter: blur(15px); }
+        .rgb-red { background: rgba(255, 0, 0, 0.2); filter: blur(15px); }
 
         /* Animaciones de carga */
         .animate-fade-in { animation: fadeIn 2s forwards; }
@@ -161,24 +161,24 @@
 
                     const centerX = canvas.width / 2;
                     const centerY = canvas.height / 2;
-                    const radius = 230; 
+                    const radius = 235; 
 
-                    // Lógica de pulso basada en bajos (frecuencias bajas 0-10)
+                    // Lógica de pulso basada en bajos
                     let bass = 0;
                     for(let i=0; i<12; i++) bass += dataArray[i];
                     bass = bass / 12;
                     
-                    const scale = 1 + (bass / 450); 
+                    const scale = 1 + (bass / 400); 
                     if(cardRef.current) {
                         cardRef.current.style.transform = `scale(${scale})`;
                         
                         const rgbLayers = cardRef.current.querySelectorAll('.rgb-layer');
-                        if (bass > 170) {
-                            const shift = bass / 15;
-                            rgbLayers[0].style.opacity = '0.6';
-                            rgbLayers[0].style.transform = `translate(-${shift}px, 0)`;
-                            rgbLayers[1].style.opacity = '0.6';
-                            rgbLayers[1].style.transform = `translate(${shift}px, 0)`;
+                        if (bass > 160) {
+                            const shift = bass / 12;
+                            rgbLayers[0].style.opacity = '0.7';
+                            rgbLayers[0].style.transform = `translate(-${shift}px, ${shift/2}px)`;
+                            rgbLayers[1].style.opacity = '0.7';
+                            rgbLayers[1].style.transform = `translate(${shift}px, -${shift/2}px)`;
                         } else {
                             rgbLayers.forEach(l => {
                                 l.style.opacity = '0';
@@ -187,9 +187,9 @@
                         }
                     }
 
-                    // Dibujar barras circulares (Estilo Trap Nation)
+                    // Dibujar barras circulares COLORIDAS (Estilo Trap Nation PRO)
                     for (let i = 0; i < bufferLength; i++) {
-                        const barHeight = (dataArray[i] / 255) * 140;
+                        const barHeight = (dataArray[i] / 255) * 180; // Aumentado para ser más evidente
                         const angle = (i / bufferLength) * Math.PI * 2;
                         
                         const xStart = centerX + Math.cos(angle) * radius;
@@ -197,10 +197,20 @@
                         const xEnd = centerX + Math.cos(angle) * (radius + barHeight);
                         const yEnd = centerY + Math.sin(angle) * (radius + barHeight);
 
+                        // Crear color dinámico basado en la frecuencia (Arcoíris neón)
+                        const hue = (i / bufferLength) * 360;
                         ctx.beginPath();
-                        ctx.strokeStyle = `rgba(255, 255, 255, ${dataArray[i]/255 + 0.1})`;
-                        ctx.lineWidth = 4;
+                        ctx.strokeStyle = `hsla(${hue}, 80%, 60%, ${dataArray[i]/255 + 0.3})`;
+                        ctx.lineWidth = 5; // Más grueso
                         ctx.lineCap = 'round';
+                        ctx.moveTo(xStart, yStart);
+                        ctx.lineTo(xEnd, yEnd);
+                        ctx.stroke();
+                        
+                        // Añadir un pequeño "glow" a cada barra
+                        ctx.beginPath();
+                        ctx.strokeStyle = `hsla(${hue}, 80%, 60%, 0.2)`;
+                        ctx.lineWidth = 10;
                         ctx.moveTo(xStart, yStart);
                         ctx.lineTo(xEnd, yEnd);
                         ctx.stroke();
@@ -214,7 +224,6 @@
                 setHasEntered(true);
                 setIsPlaying(true);
                 
-                // Iniciar Audio y saltar al segundo 15
                 if (audioRef.current) {
                     audioRef.current.currentTime = 15;
                     audioRef.current.play().then(() => {
@@ -234,7 +243,6 @@
 
             return (
                 <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center relative overflow-hidden select-none">
-                    {/* Audio con soporte CORS para visualizador */}
                     <audio ref={audioRef} src="musica.mp3" loop crossOrigin="anonymous" />
 
                     {/* Estrellas */}
@@ -260,8 +268,8 @@
                                 ref={canvasRef} 
                                 width={1000} 
                                 height={1000} 
-                                className="absolute pointer-events-none opacity-90"
-                                style={{ width: '800px', height: '800px' }}
+                                className="absolute pointer-events-none"
+                                style={{ width: '850px', height: '850px' }}
                             />
 
                             <div ref={cardRef} className="card-wrapper w-full max-w-sm">
