@@ -23,6 +23,9 @@
             min-height: 100vh;
             margin: 0;
             overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         /* --- Estrellas Animadas --- */
@@ -62,7 +65,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            transition: all 1.2s cubic-bezier(0.7, 0, 0.3, 1);
+            transition: all 1s ease-in-out;
         }
 
         .intro-img {
@@ -84,7 +87,6 @@
             text-transform: uppercase;
             transition: all 0.3s;
             cursor: pointer;
-            box-shadow: 0 0 10px rgba(255, 133, 162, 0.3);
         }
 
         .enter-btn:hover {
@@ -97,60 +99,32 @@
         .fade-out {
             opacity: 0;
             visibility: hidden;
-            transform: scale(3);
+            transform: scale(1.5);
         }
 
+        /* --- Tarjeta Principal (Restaurada a Estática) --- */
         #main-content {
             opacity: 0;
-            transform: scale(0.8);
-            transition: all 1.5s ease-out;
             display: none;
             z-index: 10;
-            position: relative;
+            transition: opacity 1s ease-in;
         }
 
         #main-content.visible {
             opacity: 1;
-            transform: scale(1);
             display: flex;
         }
 
-        /* --- Tarjeta con Borde de Movimiento --- */
         .glass-card {
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0.85);
             backdrop-filter: blur(15px);
+            border: 2px solid var(--hk-pink);
+            box-shadow: 0 0 30px rgba(255, 133, 162, 0.4);
             border-radius: 2.5rem;
             position: relative;
-            width: 100%;
-            max-width: 28rem;
-            z-index: 2;
-            padding: 2.5rem;
-        }
-
-        /* Efecto de borde rotativo estilo RGB/Neon */
-        .card-container-border {
-            position: relative;
-            padding: 4px;
-            border-radius: 2.7rem;
-            background: rgba(255, 133, 162, 0.2);
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .card-container-border::before {
-            content: '';
-            position: absolute;
-            width: 150%;
-            height: 150%;
-            background: conic-gradient(transparent, var(--hk-pink), transparent, var(--hk-pink), transparent);
-            animation: rotateBorder 4s linear infinite;
-        }
-
-        @keyframes rotateBorder {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+            padding: 3rem;
+            max-width: 450px;
+            width: 90%;
         }
 
         .clock-font {
@@ -163,14 +137,10 @@
             background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            animation: shine 3s linear infinite, glowPulse 2s ease-in-out infinite alternate;
+            animation: shine 3s linear infinite;
         }
 
         @keyframes shine { to { background-position: 200% center; } }
-        @keyframes glowPulse {
-            from { filter: drop-shadow(0 0 5px rgba(255, 133, 162, 0.5)); }
-            to { filter: drop-shadow(0 0 20px rgba(255, 133, 162, 0.9)); }
-        }
 
         .name-font {
             font-family: 'Pacifico', cursive;
@@ -183,12 +153,12 @@
         /* --- Visualizador Trap Nation --- */
         .profile-container {
             position: relative;
-            width: 320px; 
-            height: 320px;
+            width: 280px; 
+            height: 280px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
         }
 
         #visualizer-canvas {
@@ -203,16 +173,17 @@
         .profile-img-wrapper {
             position: relative;
             z-index: 2;
+            transition: transform 0.05s ease-out;
             will-change: transform;
         }
 
         .profile-img {
-            width: 160px;
-            height: 160px;
+            width: 150px;
+            height: 150px;
             object-fit: cover;
             border-radius: 50%;
             border: 4px solid var(--hk-pink);
-            box-shadow: 0 0 20px rgba(255, 133, 162, 0.6);
+            box-shadow: 0 0 15px var(--hk-pink);
         }
 
         /* --- Reproductor --- */
@@ -220,18 +191,17 @@
             position: fixed;
             bottom: 20px;
             left: 20px;
-            width: 220px;
-            background: rgba(0, 0, 0, 0.95);
+            width: 200px;
+            background: rgba(0, 0, 0, 0.9);
             border: 2px solid var(--hk-pink);
             border-radius: 20px;
-            padding: 12px;
+            padding: 10px;
             z-index: 50;
             display: flex;
             flex-direction: column;
             align-items: center;
-            box-shadow: 0 0 20px rgba(255, 133, 162, 0.3);
             opacity: 0;
-            transform: translateY(50px);
+            transform: translateY(20px);
             transition: all 1s;
         }
 
@@ -242,11 +212,10 @@
 
         .player-cover {
             width: 100%;
-            height: 120px;
+            height: 100px;
             object-fit: cover;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            margin-bottom: 10px;
+            border-radius: 10px;
+            margin-bottom: 8px;
         }
 
         .play-btn {
@@ -259,73 +228,63 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: transform 0.2s;
         }
 
-        /* Decorativos */
-        .decorative-img { position: absolute; transition: all 0.5s ease; filter: drop-shadow(0 0 8px var(--hk-pink)); }
-        .floating { animation: floating 3s ease-in-out infinite; }
-        @keyframes floating { 0%, 100% { transform: translate(-50%, 0px); } 50% { transform: translate(-50%, -15px); } }
-
-        .img-top { top: -70px; left: 50%; width: 110px; z-index: 20; }
-        .img-left { left: -90px; top: 35%; width: 100px; border-radius: 1.5rem; border: 2px solid var(--hk-pink); transform: rotate(-10deg); }
-        .img-right { right: -90px; top: 35%; width: 100px; border-radius: 1.5rem; border: 2px solid var(--hk-pink); transform: rotate(10deg); }
+        .decorative-img { position: absolute; filter: drop-shadow(0 0 8px var(--hk-pink)); }
+        .img-top { top: -70px; left: 50%; transform: translateX(-50%); width: 110px; z-index: 20; }
+        .img-left { left: -80px; top: 35%; width: 100px; border-radius: 1rem; border: 2px solid var(--hk-pink); transform: rotate(-10deg); }
+        .img-right { right: -80px; top: 35%; width: 100px; border-radius: 1rem; border: 2px solid var(--hk-pink); transform: rotate(10deg); }
 
         .sobre-mi { background: rgba(255, 133, 162, 0.1); border: 1px dashed rgba(255, 255, 255, 0.3); }
 
         @media (max-width: 768px) {
             .img-left, .img-right { display: none; }
-            #music-player { left: 50%; transform: translateX(-50%) translateY(100px); }
-            #music-player.visible { transform: translateX(-50%) translateY(0); }
         }
     </style>
 </head>
-<body class="flex items-center justify-center">
+<body>
 
     <div id="star-field" class="star-container"></div>
 
-    <!-- Pantalla de Intro -->
+    <!-- Intro -->
     <div id="intro-overlay">
-        <img src="https://xatimg.com/image/NwWBMxbmFSdJ.jpg" alt="Intro Image" class="intro-img">
+        <img src="https://xatimg.com/image/NwWBMxbmFSdJ.jpg" alt="Intro" class="intro-img">
         <button class="enter-btn" onclick="startExperience()">Entrar</button>
     </div>
 
-    <!-- Contenido Principal -->
+    <!-- Contenido -->
     <div id="main-content" class="w-full flex justify-center p-6">
-        <div class="card-container-border">
-            <div class="glass-card flex flex-col items-center text-center">
-                
-                <img src="https://xatimg.com/image/is3ptBORbsW5.png" alt="Decoration Top" class="decorative-img img-top floating">
-                <img src="https://xatimg.com/image/qa91mFeO7gMh.jpg" alt="Left Art" class="decorative-img img-left">
-                <img src="https://xatimg.com/image/9zTlPtYOevO6.jpg" alt="Right Art" class="decorative-img img-right">
+        <div class="glass-card flex flex-col items-center text-center">
+            
+            <img src="https://xatimg.com/image/is3ptBORbsW5.png" class="decorative-img img-top">
+            <img src="https://xatimg.com/image/qa91mFeO7gMh.jpg" class="decorative-img img-left">
+            <img src="https://xatimg.com/image/9zTlPtYOevO6.jpg" class="decorative-img img-right">
 
-                <h1 class="name-font mt-6 mb-4">Beige</h1>
+            <h1 class="name-font mt-6 mb-6">Beige</h1>
 
-                <!-- Visualizador Circular Estilo Trap Nation HD -->
-                <div class="profile-container">
-                    <canvas id="visualizer-canvas"></canvas>
-                    <div id="profile-wrapper" class="profile-img-wrapper">
-                        <img src="https://xatimg.com/image/zA1ybhkBKGCQ.jpg" alt="Profile" class="profile-img">
-                        <div class="absolute -top-1 -right-1 bg-white rounded-full p-1 border-2 border-pink-400 z-10">
-                            <svg style="color:#ff85a2; width:24px;" viewBox="0 0 24 24" fill="currentColor"><path d="M12,10.5c-1.38,0-2.5-1.12-2.5-2.5s1.12-2.5,2.5-2.5s2.5,1.12,2.5,2.5S13.38,10.5,12,10.5z M7,6c-1.66,0-3,1.34-3,3 c0,1.66,1.34,3,3,3c0.35,0,0.67-0.06,0.98-0.17C8.11,11.37,8.5,10.45,8.5,9.5c0-0.95-0.39-1.87-0.52-2.33C7.67,6.06,7.35,6,7,6z M17,6 c-0.35,0-0.67,0.06-0.98,0.17c0.13,0.46,0.52,1.38,0.52,2.33c0,0.95-0.39,1.87-0.52,2.33c0.31,0.11,0.63,0.17,0.98,0.17 c1.66,0,3-1.34,3-3C20,7.34,18.66,6,17,6z"/></svg>
-                        </div>
+            <div class="profile-container">
+                <canvas id="visualizer-canvas"></canvas>
+                <div id="profile-wrapper" class="profile-img-wrapper">
+                    <img src="https://xatimg.com/image/zA1ybhkBKGCQ.jpg" alt="Profile" class="profile-img">
+                    <div class="absolute -top-1 -right-1 bg-white rounded-full p-1 border-2 border-pink-400 z-10">
+                        <svg style="color:#ff85a2; width:24px;" viewBox="0 0 24 24" fill="currentColor"><path d="M12,10.5c-1.38,0-2.5-1.12-2.5-2.5s1.12-2.5,2.5-2.5s2.5,1.12,2.5,2.5S13.38,10.5,12,10.5z M7,6c-1.66,0-3,1.34-3,3 c0,1.66,1.34,3,3,3c0.35,0,0.67-0.06,0.98-0.17C8.11,11.37,8.5,10.45,8.5,9.5c0-0.95-0.39-1.87-0.52-2.33C7.67,6.06,7.35,6,7,6z M17,6 c-0.35,0-0.67,0.06-0.98,0.17c0.13,0.46,0.52,1.38,0.52,2.33c0,0.95-0.39,1.87-0.52,2.33c0.31,0.11,0.63,0.17,0.98,0.17 c1.66,0,3-1.34,3-3C20,7.34,18.66,6,17,6z"/></svg>
                     </div>
                 </div>
+            </div>
 
-                <div class="clock-font mb-8">11:11</div>
+            <div class="clock-font mb-10">11:11</div>
 
-                <div class="sobre-mi w-full p-6 rounded-3xl">
-                    <h2 class="text-pink-300 font-bold uppercase tracking-widest text-xs mb-4">Sobre Mí</h2>
-                    <div class="flex flex-col gap-4 items-center">
-                        <div class="flex items-center bg-black/60 px-4 py-2 rounded-full border border-pink-500/30 w-full justify-center">
-                            <span class="mr-2 text-xs text-pink-100">Made In:</span>
-                            <img src="https://images.emojiterra.com/twitter/512px/1f1ed-1f1f9.png" class="w-6 h-6">
-                        </div>
-                        <div class="flex items-center bg-black/60 px-4 py-2 rounded-full border border-pink-500/30 w-full justify-center">
-                            <span class="mr-2 text-xs text-pink-100">Addicted To:</span>
-                            <img src="https://xatimg.com/image/bkdP11GhVgq6.png" alt="Coquita" class="w-6 h-6 object-contain mr-1">
-                            <span class="font-bold text-pink-200">Coquita de Vidrio</span>
-                        </div>
+            <div class="sobre-mi w-full p-6 rounded-3xl">
+                <h2 class="text-pink-300 font-bold uppercase tracking-widest text-xs mb-4">Sobre Mí</h2>
+                <div class="flex flex-col gap-4 items-center">
+                    <div class="flex items-center bg-black/60 px-4 py-2 rounded-full border border-pink-500/30 w-full justify-center">
+                        <span class="mr-2 text-xs text-pink-100">Made In:</span>
+                        <img src="https://images.emojiterra.com/twitter/512px/1f1ed-1f1f9.png" class="w-6 h-6">
+                    </div>
+                    <div class="flex items-center bg-black/60 px-4 py-2 rounded-full border border-pink-500/30 w-full justify-center">
+                        <span class="mr-2 text-xs text-pink-100">Addicted To:</span>
+                        <img src="https://xatimg.com/image/bkdP11GhVgq6.png" class="w-6 h-6 object-contain mr-1">
+                        <span class="font-bold text-pink-200">Coquita de Vidrio</span>
                     </div>
                 </div>
             </div>
@@ -334,12 +293,12 @@
 
     <!-- Reproductor -->
     <div id="music-player">
-        <img src="https://xatimg.com/image/Db0MvAHCG2gl.jpg" alt="Cover" class="player-cover">
-        <div class="controls">
-            <div id="play-pause" class="play-btn" onclick="togglePlay()">
+        <img src="https://xatimg.com/image/Db0MvAHCG2gl.jpg" class="player-cover">
+        <div class="flex items-center gap-4">
+            <div class="play-btn" onclick="togglePlay()">
                 <svg id="play-icon" viewBox="0 0 24 24" width="20" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
             </div>
-            <input type="range" class="volume-slider" min="0" max="1" step="0.1" value="0.5" onchange="updateVolume(this.value)">
+            <input type="range" class="accent-pink-400 w-20" min="0" max="1" step="0.1" value="0.5" onchange="audio.volume=this.value">
         </div>
         <audio id="audio-element" loop crossorigin="anonymous">
             <source src="musica.mp3" type="audio/mpeg">
@@ -347,14 +306,12 @@
     </div>
 
     <script>
-        // --- Estrellas ---
+        // Estrellas
         const starField = document.getElementById('star-field');
         for (let i = 0; i < 150; i++) {
             const star = document.createElement('div');
             star.className = 'star';
-            const size = Math.random() * 3;
-            star.style.width = `${size}px`;
-            star.style.height = `${size}px`;
+            star.style.width = star.style.height = `${Math.random() * 3}px`;
             star.style.left = `${Math.random() * 100}%`;
             star.style.top = `${Math.random() * 100}%`;
             star.style.animationDuration = `${5 + Math.random() * 15}s`;
@@ -376,7 +333,6 @@
             source = audioCtx.createMediaElementSource(audio);
             source.connect(analyser);
             analyser.connect(audioCtx.destination);
-            
             analyser.fftSize = 512;
             bufferLength = analyser.frequencyBinCount;
             dataArray = new Uint8Array(bufferLength);
@@ -399,99 +355,65 @@
 
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
-            const innerRadius = 88; // Justo fuera del borde rosa de la foto
+            const radius = 78; 
             
-            // Detección de bajos para pulso de foto
             let bass = 0;
-            for(let i=0; i<12; i++) bass += dataArray[i];
-            bass = bass / 12;
+            for(let i=0; i<10; i++) bass += dataArray[i];
+            bass = bass / 10;
             
-            const picPulse = 1 + (bass / 350);
-            profileWrapper.style.transform = `scale(${picPulse})`;
+            // Pulso de la foto
+            profileWrapper.style.transform = `scale(${1 + (bass / 400)})`;
 
-            // Configuración de las barras (Trap Nation Style)
-            const barCount = 120;
+            // Visualizador circular (Trap Nation Style)
+            const barCount = 100;
             const step = (Math.PI * 2) / barCount;
             
             for (let i = 0; i < barCount; i++) {
-                // Simetría para las frecuencias
-                let freqIndex;
-                if (i <= barCount / 2) {
-                    freqIndex = Math.floor(i * (bufferLength / (barCount / 2)) * 0.7);
-                } else {
-                    freqIndex = Math.floor((barCount - i) * (bufferLength / (barCount / 2)) * 0.7);
-                }
+                const index = Math.floor((i / barCount) * bufferLength * 0.6);
+                const barHeight = (dataArray[index] / 255) * 60;
+                const angle = i * step - Math.PI/2;
                 
-                const rawHeight = dataArray[freqIndex];
-                const barHeight = (rawHeight / 255) * 100; // Barras más largas
-                
-                const angle = i * step - Math.PI / 2;
-                
-                // Degradado dinámico basado en frecuencia y tiempo
-                const hue = (i * (360/barCount) + Date.now()/30) % 360;
-                const brightness = 50 + (rawHeight / 255) * 50;
-                
-                ctx.strokeStyle = `hsla(${hue}, 100%, ${brightness}%, 0.9)`;
-                ctx.lineWidth = 4;
+                // Degradado basado en el video Trap Nation
+                const hue = (i * (360/barCount) + Date.now()/40) % 360;
+                ctx.strokeStyle = `hsla(${hue}, 100%, 70%, 0.8)`;
+                ctx.lineWidth = 3;
                 ctx.lineCap = 'round';
 
-                // Líneas del ecualizador
-                const xStart = centerX + Math.cos(angle) * innerRadius;
-                const yStart = centerY + Math.sin(angle) * innerRadius;
-                const xEnd = centerX + Math.cos(angle) * (innerRadius + barHeight);
-                const yEnd = centerY + Math.sin(angle) * (innerRadius + barHeight);
+                const xStart = centerX + Math.cos(angle) * radius;
+                const yStart = centerY + Math.sin(angle) * radius;
+                const xEnd = centerX + Math.cos(angle) * (radius + barHeight);
+                const yEnd = centerY + Math.sin(angle) * (radius + barHeight);
 
                 ctx.beginPath();
                 ctx.moveTo(xStart, yStart);
                 ctx.lineTo(xEnd, yEnd);
                 ctx.stroke();
 
-                // Glow intenso
-                ctx.shadowBlur = 20;
-                ctx.shadowColor = `hsla(${hue}, 100%, 50%, 0.8)`;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = `hsla(${hue}, 100%, 60%, 0.5)`;
             }
         }
 
         function startExperience() {
             initAudio();
-            // Aseguramos el play tras interacción
-            audioCtx.resume().then(() => {
-                audio.play().catch(e => console.log("Error autoplay:", e));
-            });
-            
+            audioCtx.resume();
+            audio.play().catch(() => {});
             document.getElementById('intro-overlay').classList.add('fade-out');
-            
             setTimeout(() => {
-                const main = document.getElementById('main-content');
-                main.style.display = 'flex';
-                setTimeout(() => {
-                    main.classList.add('visible');
-                    document.getElementById('music-player').classList.add('visible');
-                }, 100);
-            }, 1000);
+                document.getElementById('main-content').classList.add('visible');
+                document.getElementById('music-player').classList.add('visible');
+            }, 800);
         }
 
         function togglePlay() {
+            const icon = document.getElementById('play-icon');
             if (audio.paused) {
                 audio.play();
-                updatePlayIcon(true);
+                icon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
             } else {
                 audio.pause();
-                updatePlayIcon(false);
+                icon.innerHTML = '<path d="M8 5v14l11-7z"/>';
             }
-        }
-
-        function updatePlayIcon(isPlaying) {
-            const playIcon = document.getElementById('play-icon');
-            if (isPlaying) {
-                playIcon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
-            } else {
-                playIcon.innerHTML = '<path d="M8 5v14l11-7z"/>';
-            }
-        }
-
-        function updateVolume(val) {
-            audio.volume = val;
         }
 
         window.addEventListener('resize', resizeCanvas);
