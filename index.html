@@ -37,18 +37,6 @@
         }
 
         /* --- EFECTO TRAP NATION --- */
-        .visualizer-container {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 600px;
-            height: 600px;
-            pointer-events: none;
-            z-index: 5;
-        }
-
-        /* Contenedor de la tarjeta estilo Kenza con pulso dinámico */
         .card-wrapper {
             position: relative;
             padding: 2px;
@@ -73,7 +61,7 @@
         @keyframes rotateWave { to { transform: rotate(360deg); } }
 
         .glass-card {
-            background: rgba(0, 0, 0, 0.96);
+            background: rgba(0, 0, 0, 0.98);
             backdrop-filter: blur(15px);
             border-radius: 1.9rem;
             width: 100%;
@@ -97,8 +85,8 @@
             transition: opacity 0.1s, transform 0.1s;
         }
 
-        .rgb-cyan { background: rgba(0, 255, 255, 0.2); filter: blur(10px); }
-        .rgb-red { background: rgba(255, 0, 0, 0.2); filter: blur(10px); }
+        .rgb-cyan { background: rgba(0, 255, 255, 0.15); filter: blur(10px); }
+        .rgb-red { background: rgba(255, 0, 0, 0.15); filter: blur(10px); }
 
         /* Animaciones de carga */
         .animate-fade-in { animation: fadeIn 2s forwards; }
@@ -120,13 +108,13 @@
             const analyzerRef = useRef(null);
             const animationRef = useRef(null);
             const cardRef = useRef(null);
-            const starsRef = useRef([]);
+            const [stars, setStars] = useState([]);
 
-            // Crear estrellas al montar
+            // Generar estrellas una sola vez
             useEffect(() => {
-                const stars = [];
+                const newStars = [];
                 for(let i=0; i<150; i++) {
-                    stars.push({
+                    newStars.push({
                         id: i,
                         x: Math.random() * 100,
                         y: Math.random() * 100,
@@ -134,23 +122,27 @@
                         duration: 2 + Math.random() * 5
                     });
                 }
-                starsRef.current = stars;
+                setStars(newStars);
             }, []);
 
-            // Configurar el analizador de audio al entrar
+            // Configurar el analizador de audio real
             const initAudio = () => {
-                if (!audioRef.current) return;
+                if (!audioRef.current || analyzerRef.current) return;
                 
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                const source = audioContext.createMediaElementSource(audioRef.current);
-                const analyzer = audioContext.createAnalyser();
-                
-                analyzer.fftSize = 256;
-                source.connect(analyzer);
-                analyzer.connect(audioContext.destination);
-                
-                analyzerRef.current = analyzer;
-                drawVisualizer();
+                try {
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    const source = audioContext.createMediaElementSource(audioRef.current);
+                    const analyzer = audioContext.createAnalyser();
+                    
+                    analyzer.fftSize = 256;
+                    source.connect(analyzer);
+                    analyzer.connect(audioContext.destination);
+                    
+                    analyzerRef.current = analyzer;
+                    drawVisualizer();
+                } catch (e) {
+                    console.error("Audio Context Init Failed:", e);
+                }
             };
 
             const drawVisualizer = () => {
@@ -165,36 +157,39 @@
                     animationRef.current = requestAnimationFrame(renderFrame);
                     analyzerRef.current.getByteFrequencyData(dataArray);
 
-                    // Limpiar canvas
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
                     const centerX = canvas.width / 2;
                     const centerY = canvas.height / 2;
-                    const radius = 220; // Radio del círculo de barras
+                    const radius = 230; 
 
-                    // Calcular intensidad de graves para el pulso de la tarjeta
-                    let bassIntensity = 0;
-                    for(let i=0; i<10; i++) bassIntensity += dataArray[i];
-                    bassIntensity = bassIntensity / 10;
+                    // Lógica de pulso basada en bajos (frecuencias bajas 0-10)
+                    let bass = 0;
+                    for(let i=0; i<12; i++) bass += dataArray[i];
+                    bass = bass / 12;
                     
-                    const scale = 1 + (bassIntensity / 512); 
+                    const scale = 1 + (bass / 450); 
                     if(cardRef.current) {
                         cardRef.current.style.transform = `scale(${scale})`;
-                        // Efecto RGB basado en intensidad
+                        
                         const rgbLayers = cardRef.current.querySelectorAll('.rgb-layer');
-                        if (bassIntensity > 150) {
-                            rgbLayers[0].style.opacity = '0.5';
-                            rgbLayers[0].style.transform = `translate(-${bassIntensity/20}px, 0)`;
-                            rgbLayers[1].style.opacity = '0.5';
-                            rgbLayers[1].style.transform = `translate(${bassIntensity/20}px, 0)`;
+                        if (bass > 170) {
+                            const shift = bass / 15;
+                            rgbLayers[0].style.opacity = '0.6';
+                            rgbLayers[0].style.transform = `translate(-${shift}px, 0)`;
+                            rgbLayers[1].style.opacity = '0.6';
+                            rgbLayers[1].style.transform = `translate(${shift}px, 0)`;
                         } else {
-                            rgbLayers.forEach(l => l.style.opacity = '0');
+                            rgbLayers.forEach(l => {
+                                l.style.opacity = '0';
+                                l.style.transform = 'translate(0, 0)';
+                            });
                         }
                     }
 
-                    // Dibujar barras estilo Trap Nation
+                    // Dibujar barras circulares (Estilo Trap Nation)
                     for (let i = 0; i < bufferLength; i++) {
-                        const barHeight = (dataArray[i] / 255) * 120;
+                        const barHeight = (dataArray[i] / 255) * 140;
                         const angle = (i / bufferLength) * Math.PI * 2;
                         
                         const xStart = centerX + Math.cos(angle) * radius;
@@ -203,8 +198,8 @@
                         const yEnd = centerY + Math.sin(angle) * (radius + barHeight);
 
                         ctx.beginPath();
-                        ctx.strokeStyle = `rgba(255, 255, 255, ${dataArray[i]/255 + 0.2})`;
-                        ctx.lineWidth = 3;
+                        ctx.strokeStyle = `rgba(255, 255, 255, ${dataArray[i]/255 + 0.1})`;
+                        ctx.lineWidth = 4;
                         ctx.lineCap = 'round';
                         ctx.moveTo(xStart, yStart);
                         ctx.lineTo(xEnd, yEnd);
@@ -218,9 +213,14 @@
             const handleEnter = () => {
                 setHasEntered(true);
                 setIsPlaying(true);
-                initAudio();
-                audioRef.current.currentTime = 15;
-                audioRef.current.play();
+                
+                // Iniciar Audio y saltar al segundo 15
+                if (audioRef.current) {
+                    audioRef.current.currentTime = 15;
+                    audioRef.current.play().then(() => {
+                        initAudio();
+                    }).catch(err => console.log("Play failed:", err));
+                }
             };
 
             const togglePlay = () => {
@@ -234,26 +234,21 @@
 
             return (
                 <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center relative overflow-hidden select-none">
+                    {/* Audio con soporte CORS para visualizador */}
                     <audio ref={audioRef} src="musica.mp3" loop crossOrigin="anonymous" />
 
-                    {/* Estrellas dinámicas */}
-                    {starsRef.current.map(star => (
-                        <div 
-                            key={star.id} 
-                            className="star" 
-                            style={{ 
-                                left: `${star.x}%`, 
-                                top: `${star.y}%`, 
-                                width: `${star.size}px`, 
-                                height: `${star.size}px`, 
-                                '--d': `${star.duration}s` 
-                            }} 
-                        />
+                    {/* Estrellas */}
+                    {stars.map(star => (
+                        <div key={star.id} className="star" style={{ 
+                            left: `${star.x}%`, top: `${star.y}%`, 
+                            width: `${star.size}px`, height: `${star.size}px`, 
+                            '--d': `${star.duration}s` 
+                        }} />
                     ))}
 
                     {!hasEntered ? (
                         <div className="relative z-20 flex flex-col items-center space-y-12 animate-fade-in px-4 text-center">
-                            <h1 className="text-7xl md:text-9xl font-bold tracking-[0.4em] uppercase text-white">DEIS</h1>
+                            <h1 className="text-8xl md:text-9xl font-bold tracking-[0.4em] uppercase text-white">DEIS</h1>
                             <button onClick={handleEnter} className="px-16 py-6 border border-white/30 font-light text-[10px] tracking-[0.6em] uppercase hover:border-white hover:bg-white hover:text-black transition-all duration-700 rounded-full">
                                 Initialize Bass
                             </button>
@@ -261,13 +256,12 @@
                     ) : (
                         <div className="relative z-10 flex flex-col items-center w-full max-w-4xl h-screen justify-center">
                             
-                            {/* Canvas del Visualizador Circular */}
                             <canvas 
                                 ref={canvasRef} 
-                                width={800} 
-                                height={800} 
-                                className="absolute pointer-events-none opacity-80"
-                                style={{ transform: 'scale(0.85)' }}
+                                width={1000} 
+                                height={1000} 
+                                className="absolute pointer-events-none opacity-90"
+                                style={{ width: '800px', height: '800px' }}
                             />
 
                             <div ref={cardRef} className="card-wrapper w-full max-w-sm">
@@ -275,22 +269,21 @@
                                 <div className="rgb-layer rgb-red" />
                                 
                                 <div className="glass-card">
-                                    <h1 className="text-4xl md:text-5xl font-bold tracking-[0.5em] text-center uppercase text-white">
+                                    <h1 className="text-5xl md:text-6xl font-bold tracking-[0.5em] text-center uppercase text-white">
                                         DEIS
                                     </h1>
 
-                                    <div className="relative w-64 h-64 border-[1px] border-white/20 overflow-hidden bg-zinc-950">
+                                    <div className="relative w-64 h-64 border-[1px] border-white/10 overflow-hidden bg-zinc-950">
                                         <img 
                                             src="https://xatimg.com/image/fx2VKgs21uNd.jpg" 
                                             alt="Deis" 
-                                            className="w-full h-full object-cover grayscale-[20%]" 
+                                            className="w-full h-full object-cover grayscale-[10%]" 
                                         />
                                     </div>
 
-                                    {/* Nombre de la canción abajo */}
-                                    <div className="text-center">
-                                        <p className="text-[7px] tracking-[0.4em] text-white/30 font-bold mb-1">CURRENT BROADCAST</p>
-                                        <p className="text-[9px] font-bold tracking-[0.1em] uppercase">6ix9ine, Nicki Minaj - FEFE</p>
+                                    <div className="text-center space-y-1">
+                                        <p className="text-[7px] tracking-[0.4em] text-white/20 font-bold uppercase">Audio Reactive System</p>
+                                        <p className="text-[9px] font-bold tracking-[0.15em] uppercase">6ix9ine, Nicki Minaj - FEFE</p>
                                     </div>
                                 </div>
                             </div>
@@ -308,7 +301,7 @@
                                         </div>
                                         {isPlayerExpanded && (
                                             <div className="flex flex-col animate-fade-in text-white overflow-hidden">
-                                                <span className="text-[7px] uppercase tracking-[0.4em] text-white/40 font-bold mb-1">Reactive System</span>
+                                                <span className="text-[7px] uppercase tracking-[0.4em] text-white/40 font-bold mb-1">Frequency Active</span>
                                                 <span className="text-[9px] font-bold tracking-[0.1em] truncate max-w-[180px]">FEFE ft. Murda Beatz</span>
                                             </div>
                                         )}
