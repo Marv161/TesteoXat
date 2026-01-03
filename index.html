@@ -3,338 +3,459 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DEIS - Trap Nation Experience</title>
-    <!-- Tailwind CSS -->
+    <title>Beige - Experience</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- React y Babel -->
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Quicksand:wght@300;500;700&family=Pacifico&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Poppins:wght@300;400;600&display=swap');
+        :root {
+            --hk-pink: #ff85a2;
+            --hk-dark-pink: #ff4d6d;
+            --hk-white: #ffffff;
+            --hk-black: #000000;
+        }
 
-        body { 
-            background-color: #000; 
-            margin: 0; 
-            overflow: hidden; 
-            font-family: 'Poppins', sans-serif;
+        body {
+            background: var(--hk-black);
+            font-family: 'Quicksand', sans-serif;
             color: white;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden;
         }
 
-        h1 { font-family: 'Cinzel', serif; }
-
-        /* Firmamento Estrellado */
-        @keyframes twinkle {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 0.8; }
+        /* --- Estrellas Animadas --- */
+        .star-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            overflow: hidden;
         }
+
         .star {
             position: absolute;
             background: white;
             border-radius: 50%;
-            pointer-events: none;
-            animation: twinkle var(--d) infinite ease-in-out;
+            opacity: 0.5;
+            animation: moveStar linear infinite;
         }
 
-        /* --- EFECTO TRAP NATION --- */
-        .card-wrapper {
-            position: relative;
-            padding: 2px;
-            border-radius: 2rem;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 0 70px rgba(255, 255, 255, 0.08);
-            transition: transform 0.05s linear;
+        @keyframes moveStar {
+            from { transform: translateY(0); }
+            to { transform: translateY(-100vh); }
         }
 
-        .card-wrapper::before {
-            content: '';
-            position: absolute;
-            width: 200%;
-            height: 200%;
-            background: conic-gradient(from 0deg, transparent 20%, #000 40%, #fff 50%, #000 60%, transparent 80%);
-            animation: rotateWave 4s linear infinite;
-        }
-
-        @keyframes rotateWave { to { transform: rotate(360deg); } }
-
-        .glass-card {
-            background: rgba(0, 0, 0, 0.98);
-            backdrop-filter: blur(15px);
-            border-radius: 1.9rem;
+        /* --- Pantalla de Intro --- */
+        #intro-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            padding: 3rem 2rem;
-            text-align: center;
-            position: relative;
-            z-index: 10;
+            height: 100%;
+            background: black;
+            z-index: 100;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 2rem;
+            justify-content: center;
+            transition: all 1.2s cubic-bezier(0.7, 0, 0.3, 1);
         }
 
-        /* Aberraciones RGB que reaccionarán al audio */
-        .rgb-layer {
-            position: absolute;
-            inset: 0;
-            border-radius: inherit;
+        .intro-img {
+            width: 280px;
+            border-radius: 20px;
+            border: 3px solid var(--hk-pink);
+            box-shadow: 0 0 40px var(--hk-pink);
+            margin-bottom: 2rem;
+        }
+
+        .enter-btn {
+            background: transparent;
+            color: var(--hk-pink);
+            border: 2px solid var(--hk-pink);
+            padding: 12px 40px;
+            border-radius: 50px;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            transition: all 0.3s;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(255, 133, 162, 0.3);
+        }
+
+        .enter-btn:hover {
+            background: var(--hk-pink);
+            color: black;
+            box-shadow: 0 0 30px var(--hk-pink);
+            transform: scale(1.1);
+        }
+
+        .fade-out {
             opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.1s, transform 0.1s;
+            visibility: hidden;
+            transform: scale(3);
         }
 
-        .rgb-cyan { background: rgba(0, 255, 255, 0.2); filter: blur(15px); }
-        .rgb-red { background: rgba(255, 0, 0, 0.2); filter: blur(15px); }
+        #main-content {
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 1.5s ease-out;
+            display: none;
+            z-index: 10;
+            position: relative;
+        }
 
-        /* Animaciones de carga */
-        .animate-fade-in { animation: fadeIn 2s forwards; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        #main-content.visible {
+            opacity: 1;
+            transform: scale(1);
+            display: flex;
+        }
+
+        /* --- Tarjeta Reactiva --- */
+        .glass-card {
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(15px);
+            border: 2px solid var(--hk-pink);
+            box-shadow: 0 0 30px rgba(255, 133, 162, 0.4);
+            border-radius: 2.5rem;
+            position: relative;
+            will-change: transform;
+        }
+
+        .clock-font {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3rem;
+            font-weight: bold;
+            background: linear-gradient(to right, var(--hk-pink) 20%, #fff 40%, #fff 60%, var(--hk-pink) 80%);
+            background-size: 200% auto;
+            color: #000;
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine 3s linear infinite, glowPulse 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes shine { to { background-position: 200% center; } }
+        @keyframes glowPulse {
+            from { filter: drop-shadow(0 0 5px rgba(255, 133, 162, 0.5)); }
+            to { filter: drop-shadow(0 0 20px rgba(255, 133, 162, 0.9)); }
+        }
+
+        .name-font {
+            font-family: 'Pacifico', cursive;
+            background: linear-gradient(to bottom, #fff, var(--hk-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 3.5rem;
+        }
+
+        /* --- Visualizador de Perfil --- */
+        .profile-container {
+            position: relative;
+            width: 260px; /* Aumentado para el canvas */
+            height: 260px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+
+        #visualizer-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .profile-img {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 50%;
+            z-index: 2;
+            border: 3px solid white;
+            transition: transform 0.1s ease-out;
+        }
+
+        /* --- Reproductor --- */
+        #music-player {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 220px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid var(--hk-pink);
+            border-radius: 20px;
+            padding: 12px;
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 0 20px rgba(255, 133, 162, 0.3);
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 1s;
+        }
+
+        #music-player.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .player-cover {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 10px;
+        }
+
+        .play-btn {
+            background: var(--hk-pink);
+            color: black;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        /* Decorativos */
+        .decorative-img { position: absolute; transition: all 0.5s ease; filter: drop-shadow(0 0 8px var(--hk-pink)); }
+        .floating { animation: floating 3s ease-in-out infinite; }
+        @keyframes floating { 0%, 100% { transform: translate(-50%, 0px); } 50% { transform: translate(-50%, -15px); } }
+
+        .img-top { top: -70px; left: 50%; width: 110px; z-index: 20; }
+        .img-left { left: -90px; top: 35%; width: 100px; border-radius: 1.5rem; border: 2px solid var(--hk-pink); transform: rotate(-10deg); }
+        .img-right { right: -90px; top: 35%; width: 100px; border-radius: 1.5rem; border: 2px solid var(--hk-pink); transform: rotate(10deg); }
+
+        .sobre-mi { background: rgba(255, 133, 162, 0.1); border: 1px dashed rgba(255, 255, 255, 0.3); }
+
+        @media (max-width: 768px) {
+            .img-left, .img-right { display: none; }
+            #music-player { left: 50%; transform: translateX(-50%) translateY(100px); }
+            #music-player.visible { transform: translateX(-50%) translateY(0); }
+        }
     </style>
 </head>
-<body>
-    <div id="root"></div>
+<body class="flex items-center justify-center">
 
-    <script type="text/babel">
-        const { useState, useEffect, useRef } = React;
+    <!-- Capa de Estrellas -->
+    <div id="star-field" class="star-container"></div>
 
-        const App = () => {
-            const [hasEntered, setHasEntered] = useState(false);
-            const [isPlaying, setIsPlaying] = useState(false);
-            const [isPlayerExpanded, setIsPlayerExpanded] = useState(false);
-            const audioRef = useRef(null);
-            const canvasRef = useRef(null);
-            const analyzerRef = useRef(null);
-            const animationRef = useRef(null);
-            const cardRef = useRef(null);
-            const [stars, setStars] = useState([]);
+    <!-- Pantalla de Intro -->
+    <div id="intro-overlay">
+        <img src="https://xatimg.com/image/NwWBMxbmFSdJ.jpg" alt="Intro Image" class="intro-img">
+        <button class="enter-btn" onclick="startExperience()">Entrar</button>
+    </div>
 
-            // Generar estrellas una sola vez
-            useEffect(() => {
-                const newStars = [];
-                for(let i=0; i<150; i++) {
-                    newStars.push({
-                        id: i,
-                        x: Math.random() * 100,
-                        y: Math.random() * 100,
-                        size: Math.random() * 2,
-                        duration: 2 + Math.random() * 5
-                    });
-                }
-                setStars(newStars);
-            }, []);
+    <!-- Contenedor Principal -->
+    <div id="main-content" class="w-full flex justify-center p-6">
+        <div id="card-container" class="glass-card max-w-md w-full p-10 flex flex-col items-center text-center">
+            
+            <img src="https://xatimg.com/image/is3ptBORbsW5.png" alt="Decoration Top" class="decorative-img img-top floating">
+            <img src="https://xatimg.com/image/qa91mFeO7gMh.jpg" alt="Left Art" class="decorative-img img-left">
+            <img src="https://xatimg.com/image/9zTlPtYOevO6.jpg" alt="Right Art" class="decorative-img img-right">
 
-            // Configurar el analizador de audio real
-            const initAudio = () => {
-                if (!audioRef.current || analyzerRef.current) return;
-                
-                try {
-                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                    const source = audioContext.createMediaElementSource(audioRef.current);
-                    const analyzer = audioContext.createAnalyser();
-                    
-                    analyzer.fftSize = 256;
-                    source.connect(analyzer);
-                    analyzer.connect(audioContext.destination);
-                    
-                    analyzerRef.current = analyzer;
-                    drawVisualizer();
-                } catch (e) {
-                    console.error("Audio Context Init Failed:", e);
-                }
-            };
+            <h1 class="name-font mt-6 mb-6">Beige</h1>
 
-            const drawVisualizer = () => {
-                if (!analyzerRef.current || !canvasRef.current) return;
-
-                const canvas = canvasRef.current;
-                const ctx = canvas.getContext('2d');
-                const bufferLength = analyzerRef.current.frequencyBinCount;
-                const dataArray = new Uint8Array(bufferLength);
-
-                const renderFrame = () => {
-                    animationRef.current = requestAnimationFrame(renderFrame);
-                    analyzerRef.current.getByteFrequencyData(dataArray);
-
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-                    const centerX = canvas.width / 2;
-                    const centerY = canvas.height / 2;
-                    const radius = 235; 
-
-                    // Lógica de pulso basada en bajos
-                    let bass = 0;
-                    for(let i=0; i<12; i++) bass += dataArray[i];
-                    bass = bass / 12;
-                    
-                    const scale = 1 + (bass / 400); 
-                    if(cardRef.current) {
-                        cardRef.current.style.transform = `scale(${scale})`;
-                        
-                        const rgbLayers = cardRef.current.querySelectorAll('.rgb-layer');
-                        if (bass > 160) {
-                            const shift = bass / 12;
-                            rgbLayers[0].style.opacity = '0.7';
-                            rgbLayers[0].style.transform = `translate(-${shift}px, ${shift/2}px)`;
-                            rgbLayers[1].style.opacity = '0.7';
-                            rgbLayers[1].style.transform = `translate(${shift}px, -${shift/2}px)`;
-                        } else {
-                            rgbLayers.forEach(l => {
-                                l.style.opacity = '0';
-                                l.style.transform = 'translate(0, 0)';
-                            });
-                        }
-                    }
-
-                    // Dibujar barras circulares COLORIDAS (Estilo Trap Nation PRO)
-                    for (let i = 0; i < bufferLength; i++) {
-                        const barHeight = (dataArray[i] / 255) * 180; // Aumentado para ser más evidente
-                        const angle = (i / bufferLength) * Math.PI * 2;
-                        
-                        const xStart = centerX + Math.cos(angle) * radius;
-                        const yStart = centerY + Math.sin(angle) * radius;
-                        const xEnd = centerX + Math.cos(angle) * (radius + barHeight);
-                        const yEnd = centerY + Math.sin(angle) * (radius + barHeight);
-
-                        // Crear color dinámico basado en la frecuencia (Arcoíris neón)
-                        const hue = (i / bufferLength) * 360;
-                        ctx.beginPath();
-                        ctx.strokeStyle = `hsla(${hue}, 80%, 60%, ${dataArray[i]/255 + 0.3})`;
-                        ctx.lineWidth = 5; // Más grueso
-                        ctx.lineCap = 'round';
-                        ctx.moveTo(xStart, yStart);
-                        ctx.lineTo(xEnd, yEnd);
-                        ctx.stroke();
-                        
-                        // Añadir un pequeño "glow" a cada barra
-                        ctx.beginPath();
-                        ctx.strokeStyle = `hsla(${hue}, 80%, 60%, 0.2)`;
-                        ctx.lineWidth = 10;
-                        ctx.moveTo(xStart, yStart);
-                        ctx.lineTo(xEnd, yEnd);
-                        ctx.stroke();
-                    }
-                };
-
-                renderFrame();
-            };
-
-            const handleEnter = () => {
-                setHasEntered(true);
-                setIsPlaying(true);
-                
-                if (audioRef.current) {
-                    audioRef.current.currentTime = 15;
-                    audioRef.current.play().then(() => {
-                        initAudio();
-                    }).catch(err => console.log("Play failed:", err));
-                }
-            };
-
-            const togglePlay = () => {
-                if (isPlaying) {
-                    audioRef.current.pause();
-                } else {
-                    audioRef.current.play();
-                }
-                setIsPlaying(!isPlaying);
-            };
-
-            return (
-                <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center relative overflow-hidden select-none">
-                    <audio ref={audioRef} src="musica.mp3" loop crossOrigin="anonymous" />
-
-                    {/* Estrellas */}
-                    {stars.map(star => (
-                        <div key={star.id} className="star" style={{ 
-                            left: `${star.x}%`, top: `${star.y}%`, 
-                            width: `${star.size}px`, height: `${star.size}px`, 
-                            '--d': `${star.duration}s` 
-                        }} />
-                    ))}
-
-                    {!hasEntered ? (
-                        <div className="relative z-20 flex flex-col items-center space-y-12 animate-fade-in px-4 text-center">
-                            <h1 className="text-8xl md:text-9xl font-bold tracking-[0.4em] uppercase text-white">DEIS</h1>
-                            <button onClick={handleEnter} className="px-16 py-6 border border-white/30 font-light text-[10px] tracking-[0.6em] uppercase hover:border-white hover:bg-white hover:text-black transition-all duration-700 rounded-full">
-                                Initialize Bass
-                            </button>
-                        </div>
-                    ) : (
-                        <div className="relative z-10 flex flex-col items-center w-full max-w-4xl h-screen justify-center">
-                            
-                            <canvas 
-                                ref={canvasRef} 
-                                width={1000} 
-                                height={1000} 
-                                className="absolute pointer-events-none"
-                                style={{ width: '850px', height: '850px' }}
-                            />
-
-                            <div ref={cardRef} className="card-wrapper w-full max-w-sm">
-                                <div className="rgb-layer rgb-cyan" />
-                                <div className="rgb-layer rgb-red" />
-                                
-                                <div className="glass-card">
-                                    <h1 className="text-5xl md:text-6xl font-bold tracking-[0.5em] text-center uppercase text-white">
-                                        DEIS
-                                    </h1>
-
-                                    <div className="relative w-64 h-64 border-[1px] border-white/10 overflow-hidden bg-zinc-950">
-                                        <img 
-                                            src="https://xatimg.com/image/fx2VKgs21uNd.jpg" 
-                                            alt="Deis" 
-                                            className="w-full h-full object-cover grayscale-[10%]" 
-                                        />
-                                    </div>
-
-                                    <div className="text-center space-y-1">
-                                        <p className="text-[7px] tracking-[0.4em] text-white/20 font-bold uppercase">Audio Reactive System</p>
-                                        <p className="text-[9px] font-bold tracking-[0.15em] uppercase">6ix9ine, Nicki Minaj - FEFE</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Mini Player */}
-                    {hasEntered && (
-                        <div className={`fixed bottom-10 left-10 z-50 transition-all duration-1000 ${isPlayerExpanded ? 'w-80' : 'w-16'}`}>
-                            <div className="bg-white/[0.03] backdrop-blur-3xl border border-white/10 rounded-full overflow-hidden shadow-2xl">
-                                <div className="flex items-center p-5 cursor-pointer justify-between" onClick={() => setIsPlayerExpanded(!isPlayerExpanded)}>
-                                    <div className="flex items-center gap-5">
-                                        <div className={`p-1.5 border border-white/10 rounded-full ${isPlaying ? 'animate-spin-slow' : ''}`}>
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4"><path d="M9 18V5l12-2v13" /><circle cx="6" cy="18" r="3" /><circle cx="18" cy="16" r="3" /></svg>
-                                        </div>
-                                        {isPlayerExpanded && (
-                                            <div className="flex flex-col animate-fade-in text-white overflow-hidden">
-                                                <span className="text-[7px] uppercase tracking-[0.4em] text-white/40 font-bold mb-1">Frequency Active</span>
-                                                <span className="text-[9px] font-bold tracking-[0.1em] truncate max-w-[180px]">FEFE ft. Murda Beatz</span>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                                {isPlayerExpanded && (
-                                    <div className="px-6 pb-8 flex items-center justify-center animate-fade-in">
-                                        <button onClick={(e) => { e.stopPropagation(); togglePlay(); }} className="w-14 h-14 border border-white/5 rounded-full flex items-center justify-center hover:bg-white hover:text-black transition-all">
-                                            {isPlaying ? (
-                                                <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5"><rect x="6" y="4" width="4" height="16" /><rect x="14" y="4" width="4" height="16" /></svg>
-                                            ) : (
-                                                <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 ml-1"><polygon points="5 3 19 12 5 21 5 3" /></svg>
-                                            )}
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    )}
+            <!-- Visualizador Circular -->
+            <div class="profile-container">
+                <canvas id="visualizer-canvas"></canvas>
+                <img src="https://xatimg.com/image/zA1ybhkBKGCQ.jpg" alt="Profile" id="profile-pic" class="profile-img">
+                <div class="absolute -top-1 -right-1 bg-white rounded-full p-1 border-2 border-pink-400 z-10">
+                    <svg style="color:#ff85a2; width:24px;" viewBox="0 0 24 24" fill="currentColor"><path d="M12,10.5c-1.38,0-2.5-1.12-2.5-2.5s1.12-2.5,2.5-2.5s2.5,1.12,2.5,2.5S13.38,10.5,12,10.5z M7,6c-1.66,0-3,1.34-3,3 c0,1.66,1.34,3,3,3c0.35,0,0.67-0.06,0.98-0.17C8.11,11.37,8.5,10.45,8.5,9.5c0-0.95-0.39-1.87-0.52-2.33C7.67,6.06,7.35,6,7,6z M17,6 c-0.35,0-0.67,0.06-0.98,0.17c0.13,0.46,0.52,1.38,0.52,2.33c0,0.95-0.39,1.87-0.52,2.33c0.31,0.11,0.63,0.17,0.98,0.17 c1.66,0,3-1.34,3-3C20,7.34,18.66,6,17,6z"/></svg>
                 </div>
-            );
-        };
+            </div>
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
+            <div class="clock-font mb-10">11:11</div>
+
+            <div class="sobre-mi w-full p-6 rounded-3xl">
+                <h2 class="text-pink-300 font-bold uppercase tracking-widest text-xs mb-4">Sobre Mí</h2>
+                <div class="flex flex-col gap-4 items-center">
+                    <div class="flex items-center bg-black/60 px-4 py-2 rounded-full border border-pink-500/30 w-full justify-center">
+                        <span class="mr-2 text-xs text-pink-100">Made In:</span>
+                        <img src="https://images.emojiterra.com/twitter/512px/1f1ed-1f1f9.png" class="w-6 h-6">
+                    </div>
+                    <div class="flex items-center bg-black/60 px-4 py-2 rounded-full border border-pink-500/30 w-full justify-center">
+                        <span class="mr-2 text-xs text-pink-100">Addicted To:</span>
+                        <img src="https://xatimg.com/image/bkdP11GhVgq6.png" alt="Coquita" class="w-6 h-6 object-contain mr-1">
+                        <span class="font-bold text-pink-200">Coquita de Vidrio</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reproductor -->
+    <div id="music-player">
+        <img src="https://xatimg.com/image/Db0MvAHCG2gl.jpg" alt="Cover" class="player-cover">
+        <div class="controls">
+            <div id="play-pause" class="play-btn" onclick="togglePlay()">
+                <svg id="play-icon" viewBox="0 0 24 24" width="20" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+            <input type="range" class="volume-slider" min="0" max="1" step="0.1" value="0.5" onchange="updateVolume(this.value)">
+        </div>
+        <!-- IMPORTANTE: crossOrigin="anonymous" para Web Audio API -->
+        <audio id="audio-element" loop crossorigin="anonymous">
+            <source src="musica.mp3" type="audio/mpeg">
+        </audio>
+    </div>
+
+    <script>
+        // --- Setup de Estrellas ---
+        const starField = document.getElementById('star-field');
+        for (let i = 0; i < 150; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            const size = Math.random() * 3;
+            star.style.width = `${size}px`;
+            star.style.height = `${size}px`;
+            star.style.left = `${Math.random() * 100}%`;
+            star.style.top = `${Math.random() * 100}%`;
+            star.style.animationDuration = `${5 + Math.random() * 15}s`;
+            starField.appendChild(star);
+        }
+
+        // --- Motor de Audio y Visualizador ---
+        const audio = document.getElementById('audio-element');
+        const canvas = document.getElementById('visualizer-canvas');
+        const ctx = canvas.getContext('2d');
+        const profilePic = document.getElementById('profile-pic');
+        const cardContainer = document.getElementById('card-container');
+        
+        let audioCtx, analyser, source, dataArray, bufferLength;
+        let isInitialized = false;
+
+        function initAudio() {
+            if (isInitialized) return;
+            
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioCtx.createAnalyser();
+            source = audioCtx.createMediaElementSource(audio);
+            
+            source.connect(analyser);
+            analyser.connect(audioCtx.destination);
+            
+            analyser.fftSize = 256;
+            bufferLength = analyser.frequencyBinCount;
+            dataArray = new Uint8Array(bufferLength);
+            
+            isInitialized = true;
+            resizeCanvas();
+            drawVisualizer();
+        }
+
+        function resizeCanvas() {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+        }
+
+        function drawVisualizer() {
+            requestAnimationFrame(drawVisualizer);
+            if (!analyser) return;
+
+            analyser.getByteFrequencyData(dataArray);
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = 78; // Justo fuera de la foto de 150px (75 radius)
+            
+            // Cálculo de Bass (Bajos) para pulsación
+            let bass = 0;
+            for(let i=0; i<10; i++) bass += dataArray[i];
+            bass = bass / 10;
+            
+            // Pulsación de la tarjeta y la foto
+            const scale = 1 + (bass / 512); 
+            cardContainer.style.transform = `scale(${1 + (bass / 1000)})`;
+            profilePic.style.transform = `scale(${scale})`;
+
+            // Dibujo de barras Trap Nation
+            const barCount = 60;
+            const step = (Math.PI * 2) / barCount;
+            
+            for (let i = 0; i < barCount; i++) {
+                const index = Math.floor((i / barCount) * bufferLength * 0.6);
+                const barHeight = (dataArray[index] / 255) * 50;
+                
+                const angle = i * step;
+                
+                // Color dinámico basado en frecuencia y rotación
+                const hue = (i * (360/barCount) + Date.now()/50) % 360;
+                ctx.strokeStyle = `hsla(${hue}, 80%, 70%, 0.8)`;
+                ctx.lineWidth = 3;
+                ctx.lineCap = 'round';
+
+                const xStart = centerX + Math.cos(angle) * radius;
+                const yStart = centerY + Math.sin(angle) * radius;
+                const xEnd = centerX + Math.cos(angle) * (radius + barHeight);
+                const yEnd = centerY + Math.sin(angle) * (radius + barHeight);
+
+                ctx.beginPath();
+                ctx.moveTo(xStart, yStart);
+                ctx.lineTo(xEnd, yEnd);
+                ctx.stroke();
+
+                // Brillo adicional para las barras
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = `hsla(${hue}, 80%, 70%, 0.5)`;
+            }
+        }
+
+        // --- Funciones de Control ---
+        function startExperience() {
+            initAudio();
+            audio.play().catch(e => console.log("Error autoplay:", e));
+            
+            document.getElementById('intro-overlay').classList.add('fade-out');
+            
+            setTimeout(() => {
+                const main = document.getElementById('main-content');
+                main.style.display = 'flex';
+                setTimeout(() => {
+                    main.classList.add('visible');
+                    document.getElementById('music-player').classList.add('visible');
+                }, 100);
+            }, 1000);
+        }
+
+        function togglePlay() {
+            if (audio.paused) {
+                audio.play();
+                updatePlayIcon(true);
+            } else {
+                audio.pause();
+                updatePlayIcon(false);
+            }
+        }
+
+        function updatePlayIcon(isPlaying) {
+            const playIcon = document.getElementById('play-icon');
+            if (isPlaying) {
+                playIcon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+            } else {
+                playIcon.innerHTML = '<path d="M8 5v14l11-7z"/>';
+            }
+        }
+
+        function updateVolume(val) {
+            audio.volume = val;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
     </script>
 </body>
 </html>
