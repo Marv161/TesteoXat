@@ -124,29 +124,33 @@
             width: 100%;
             max-width: 28rem;
             z-index: 2;
-            overflow: visible;
+            padding: 2.5rem;
         }
 
-        /* Efecto de borde rotativo */
-        .glass-card::after {
+        /* Efecto de borde rotativo estilo RGB/Neon */
+        .card-container-border {
+            position: relative;
+            padding: 4px;
+            border-radius: 2.7rem;
+            background: rgba(255, 133, 162, 0.2);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-container-border::before {
             content: '';
             position: absolute;
-            top: -3px; left: -3px; right: -3px; bottom: -3px;
-            background: conic-gradient(from var(--angle), var(--hk-pink), transparent, var(--hk-pink), transparent, var(--hk-pink));
-            border-radius: 2.6rem;
-            z-index: -1;
-            animation: 4s rotate linear infinite;
+            width: 150%;
+            height: 150%;
+            background: conic-gradient(transparent, var(--hk-pink), transparent, var(--hk-pink), transparent);
+            animation: rotateBorder 4s linear infinite;
         }
 
-        @property --angle {
-            syntax: '<angle>';
-            initial-value: 0deg;
-            inherits: false;
-        }
-
-        @keyframes rotate {
-            from { --angle: 0deg; }
-            to { --angle: 360deg; }
+        @keyframes rotateBorder {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
 
         .clock-font {
@@ -199,7 +203,6 @@
         .profile-img-wrapper {
             position: relative;
             z-index: 2;
-            transition: transform 0.05s ease-out;
             will-change: transform;
         }
 
@@ -289,38 +292,40 @@
 
     <!-- Contenido Principal -->
     <div id="main-content" class="w-full flex justify-center p-6">
-        <div class="glass-card p-10 flex flex-col items-center text-center">
-            
-            <img src="https://xatimg.com/image/is3ptBORbsW5.png" alt="Decoration Top" class="decorative-img img-top floating">
-            <img src="https://xatimg.com/image/qa91mFeO7gMh.jpg" alt="Left Art" class="decorative-img img-left">
-            <img src="https://xatimg.com/image/9zTlPtYOevO6.jpg" alt="Right Art" class="decorative-img img-right">
+        <div class="card-container-border">
+            <div class="glass-card flex flex-col items-center text-center">
+                
+                <img src="https://xatimg.com/image/is3ptBORbsW5.png" alt="Decoration Top" class="decorative-img img-top floating">
+                <img src="https://xatimg.com/image/qa91mFeO7gMh.jpg" alt="Left Art" class="decorative-img img-left">
+                <img src="https://xatimg.com/image/9zTlPtYOevO6.jpg" alt="Right Art" class="decorative-img img-right">
 
-            <h1 class="name-font mt-6 mb-4">Beige</h1>
+                <h1 class="name-font mt-6 mb-4">Beige</h1>
 
-            <!-- Visualizador Circular Estilo Trap Nation -->
-            <div class="profile-container">
-                <canvas id="visualizer-canvas"></canvas>
-                <div id="profile-wrapper" class="profile-img-wrapper">
-                    <img src="https://xatimg.com/image/zA1ybhkBKGCQ.jpg" alt="Profile" class="profile-img">
-                    <div class="absolute -top-1 -right-1 bg-white rounded-full p-1 border-2 border-pink-400 z-10">
-                        <svg style="color:#ff85a2; width:24px;" viewBox="0 0 24 24" fill="currentColor"><path d="M12,10.5c-1.38,0-2.5-1.12-2.5-2.5s1.12-2.5,2.5-2.5s2.5,1.12,2.5,2.5S13.38,10.5,12,10.5z M7,6c-1.66,0-3,1.34-3,3 c0,1.66,1.34,3,3,3c0.35,0,0.67-0.06,0.98-0.17C8.11,11.37,8.5,10.45,8.5,9.5c0-0.95-0.39-1.87-0.52-2.33C7.67,6.06,7.35,6,7,6z M17,6 c-0.35,0-0.67,0.06-0.98,0.17c0.13,0.46,0.52,1.38,0.52,2.33c0,0.95-0.39,1.87-0.52,2.33c0.31,0.11,0.63,0.17,0.98,0.17 c1.66,0,3-1.34,3-3C20,7.34,18.66,6,17,6z"/></svg>
+                <!-- Visualizador Circular Estilo Trap Nation HD -->
+                <div class="profile-container">
+                    <canvas id="visualizer-canvas"></canvas>
+                    <div id="profile-wrapper" class="profile-img-wrapper">
+                        <img src="https://xatimg.com/image/zA1ybhkBKGCQ.jpg" alt="Profile" class="profile-img">
+                        <div class="absolute -top-1 -right-1 bg-white rounded-full p-1 border-2 border-pink-400 z-10">
+                            <svg style="color:#ff85a2; width:24px;" viewBox="0 0 24 24" fill="currentColor"><path d="M12,10.5c-1.38,0-2.5-1.12-2.5-2.5s1.12-2.5,2.5-2.5s2.5,1.12,2.5,2.5S13.38,10.5,12,10.5z M7,6c-1.66,0-3,1.34-3,3 c0,1.66,1.34,3,3,3c0.35,0,0.67-0.06,0.98-0.17C8.11,11.37,8.5,10.45,8.5,9.5c0-0.95-0.39-1.87-0.52-2.33C7.67,6.06,7.35,6,7,6z M17,6 c-0.35,0-0.67,0.06-0.98,0.17c0.13,0.46,0.52,1.38,0.52,2.33c0,0.95-0.39,1.87-0.52,2.33c0.31,0.11,0.63,0.17,0.98,0.17 c1.66,0,3-1.34,3-3C20,7.34,18.66,6,17,6z"/></svg>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="clock-font mb-8">11:11</div>
+                <div class="clock-font mb-8">11:11</div>
 
-            <div class="sobre-mi w-full p-6 rounded-3xl">
-                <h2 class="text-pink-300 font-bold uppercase tracking-widest text-xs mb-4">Sobre Mí</h2>
-                <div class="flex flex-col gap-4 items-center">
-                    <div class="flex items-center bg-black/60 px-4 py-2 rounded-full border border-pink-500/30 w-full justify-center">
-                        <span class="mr-2 text-xs text-pink-100">Made In:</span>
-                        <img src="https://images.emojiterra.com/twitter/512px/1f1ed-1f1f9.png" class="w-6 h-6">
-                    </div>
-                    <div class="flex items-center bg-black/60 px-4 py-2 rounded-full border border-pink-500/30 w-full justify-center">
-                        <span class="mr-2 text-xs text-pink-100">Addicted To:</span>
-                        <img src="https://xatimg.com/image/bkdP11GhVgq6.png" alt="Coquita" class="w-6 h-6 object-contain mr-1">
-                        <span class="font-bold text-pink-200">Coquita de Vidrio</span>
+                <div class="sobre-mi w-full p-6 rounded-3xl">
+                    <h2 class="text-pink-300 font-bold uppercase tracking-widest text-xs mb-4">Sobre Mí</h2>
+                    <div class="flex flex-col gap-4 items-center">
+                        <div class="flex items-center bg-black/60 px-4 py-2 rounded-full border border-pink-500/30 w-full justify-center">
+                            <span class="mr-2 text-xs text-pink-100">Made In:</span>
+                            <img src="https://images.emojiterra.com/twitter/512px/1f1ed-1f1f9.png" class="w-6 h-6">
+                        </div>
+                        <div class="flex items-center bg-black/60 px-4 py-2 rounded-full border border-pink-500/30 w-full justify-center">
+                            <span class="mr-2 text-xs text-pink-100">Addicted To:</span>
+                            <img src="https://xatimg.com/image/bkdP11GhVgq6.png" alt="Coquita" class="w-6 h-6 object-contain mr-1">
+                            <span class="font-bold text-pink-200">Coquita de Vidrio</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -394,38 +399,43 @@
 
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
-            const innerRadius = 85; 
+            const innerRadius = 88; // Justo fuera del borde rosa de la foto
             
-            // Detección de bajos para pulso
+            // Detección de bajos para pulso de foto
             let bass = 0;
-            for(let i=0; i<10; i++) bass += dataArray[i];
-            bass = bass / 10;
+            for(let i=0; i<12; i++) bass += dataArray[i];
+            bass = bass / 12;
             
-            // Pulso solo en la foto
-            const picPulse = 1 + (bass / 400);
+            const picPulse = 1 + (bass / 350);
             profileWrapper.style.transform = `scale(${picPulse})`;
 
-            // Configuración de las barras (Estilo Trap Nation)
-            const barCount = 100;
+            // Configuración de las barras (Trap Nation Style)
+            const barCount = 120;
             const step = (Math.PI * 2) / barCount;
             
             for (let i = 0; i < barCount; i++) {
-                // Seleccionamos frecuencias (simetría)
-                const freqIndex = Math.floor(Math.abs(i - barCount/2) * (bufferLength / barCount) * 0.8);
+                // Simetría para las frecuencias
+                let freqIndex;
+                if (i <= barCount / 2) {
+                    freqIndex = Math.floor(i * (bufferLength / (barCount / 2)) * 0.7);
+                } else {
+                    freqIndex = Math.floor((barCount - i) * (bufferLength / (barCount / 2)) * 0.7);
+                }
+                
                 const rawHeight = dataArray[freqIndex];
-                const barHeight = (rawHeight / 255) * 80;
+                const barHeight = (rawHeight / 255) * 100; // Barras más largas
                 
-                const angle = i * step - Math.PI/2;
+                const angle = i * step - Math.PI / 2;
                 
-                // Color dinámico en degradé (Arcoíris neón que cambia con el beat)
-                const hue = (i * (360/barCount) + Date.now()/50) % 360;
-                const brightness = 60 + (bass / 5);
+                // Degradado dinámico basado en frecuencia y tiempo
+                const hue = (i * (360/barCount) + Date.now()/30) % 360;
+                const brightness = 50 + (rawHeight / 255) * 50;
                 
                 ctx.strokeStyle = `hsla(${hue}, 100%, ${brightness}%, 0.9)`;
                 ctx.lineWidth = 4;
                 ctx.lineCap = 'round';
 
-                // Líneas del ecualizador saliendo del borde rosa
+                // Líneas del ecualizador
                 const xStart = centerX + Math.cos(angle) * innerRadius;
                 const yStart = centerY + Math.sin(angle) * innerRadius;
                 const xEnd = centerX + Math.cos(angle) * (innerRadius + barHeight);
@@ -436,16 +446,21 @@
                 ctx.lineTo(xEnd, yEnd);
                 ctx.stroke();
 
-                // Efecto Glow vibrante
-                ctx.shadowBlur = 15;
-                ctx.shadowColor = `hsla(${hue}, 100%, 50%, 0.7)`;
+                // Glow intenso
+                ctx.shadowBlur = 20;
+                ctx.shadowColor = `hsla(${hue}, 100%, 50%, 0.8)`;
             }
         }
 
         function startExperience() {
             initAudio();
-            audio.play().catch(e => console.log("Error autoplay:", e));
+            // Aseguramos el play tras interacción
+            audioCtx.resume().then(() => {
+                audio.play().catch(e => console.log("Error autoplay:", e));
+            });
+            
             document.getElementById('intro-overlay').classList.add('fade-out');
+            
             setTimeout(() => {
                 const main = document.getElementById('main-content');
                 main.style.display = 'flex';
