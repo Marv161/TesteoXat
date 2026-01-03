@@ -3,192 +3,337 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Una Carta de Amor para Melany</title>
+    <title>DEIS - Trap Nation Experience</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Quicksand:wght@300;400;500&display=swap" rel="stylesheet">
+    <!-- React y Babel -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <style>
-        body {
-            font-family: 'Quicksand', sans-serif;
-            background-color: #FEFBF6;
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Poppins:wght@300;400;600&display=swap');
+
+        body { 
+            background-color: #000; 
+            margin: 0; 
+            overflow: hidden; 
+            font-family: 'Poppins', sans-serif;
+            color: white;
         }
-        .font-dancing {
-            font-family: 'Dancing Script', cursive;
+
+        h1 { font-family: 'Cinzel', serif; }
+
+        /* Firmamento Estrellado */
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
         }
-        .card {
-            background-color: #FFF;
-            border: 1px solid #F3D0D7;
-            border-radius: 1.5rem;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
-            transition: transform 0.3s ease;
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: twinkle var(--d) infinite ease-in-out;
         }
-        .card:hover {
-            transform: translateY(-5px);
+
+        /* --- EFECTO TRAP NATION --- */
+        .visualizer-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 600px;
+            pointer-events: none;
+            z-index: 5;
         }
-        .photo-placeholder {
-            width: 100%;
-            aspect-ratio: 1 / 1;
-            border: 3px dashed #F3D0D7;
-            border-radius: 1rem;
+
+        /* Contenedor de la tarjeta estilo Kenza con pulso dinámico */
+        .card-wrapper {
+            position: relative;
+            padding: 2px;
+            border-radius: 2rem;
+            overflow: hidden;
             display: flex;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 50px rgba(255, 255, 255, 0.05);
+            transition: transform 0.05s linear;
+        }
+
+        .card-wrapper::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent 20%, #000 40%, #fff 50%, #000 60%, transparent 80%);
+            animation: rotateWave 4s linear infinite;
+        }
+
+        @keyframes rotateWave { to { transform: rotate(360deg); } }
+
+        .glass-card {
+            background: rgba(0, 0, 0, 0.96);
+            backdrop-filter: blur(15px);
+            border-radius: 1.9rem;
+            width: 100%;
+            padding: 3rem 2rem;
             text-align: center;
-            background-color: #FEFBF6;
-            color: #A6808C;
-            font-size: 0.9rem;
-            padding: 1rem;
+            position: relative;
+            z-index: 10;
+            display: flex;
             flex-direction: column;
-            gap: 0.5rem;
+            align-items: center;
+            gap: 2rem;
         }
-        .icon {
-            width: 24px;
-            height: 24px;
-            stroke: #D9899A;
+
+        /* Aberraciones RGB que reaccionarán al audio */
+        .rgb-layer {
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.1s, transform 0.1s;
         }
-        h2 {
-            color: #A6808C;
-        }
-        p {
-            color: #594A4E;
-        }
-        .final-message {
-            background: linear-gradient(to top, #FADADD, #FFF);
-        }
+
+        .rgb-cyan { background: rgba(0, 255, 255, 0.2); filter: blur(10px); }
+        .rgb-red { background: rgba(255, 0, 0, 0.2); filter: blur(10px); }
+
+        /* Animaciones de carga */
+        .animate-fade-in { animation: fadeIn 2s forwards; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
-<body class="bg-[#FEFBF6] p-4 sm:p-8">
+<body>
+    <div id="root"></div>
 
-    <div class="max-w-2xl mx-auto">
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
 
-        <!-- Header -->
-        <header class="text-center mb-12">
-            <h1 class="font-dancing text-5xl sm:text-7xl text-[#D9899A]">Para la mujer que amo...</h1>
-            <p class="text-lg text-gray-500 mt-2">Una historia sobre mi Melany</p>
-        </header>
+        const App = () => {
+            const [hasEntered, setHasEntered] = useState(false);
+            const [isPlaying, setIsPlaying] = useState(false);
+            const [isPlayerExpanded, setIsPlayerExpanded] = useState(false);
+            const audioRef = useRef(null);
+            const canvasRef = useRef(null);
+            const analyzerRef = useRef(null);
+            const animationRef = useRef(null);
+            const cardRef = useRef(null);
+            const starsRef = useRef([]);
 
-        <!-- Intro -->
-        <div class="card text-center">
-            <p class="text-xl italic">Holaaa, soy Kevin y hoy les voy a presentar a la mujer que me encanta 💖</p>
-            <div class="photo-placeholder mt-6">
-                <svg class="icon" fill="none" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6.75 7.5l3 2.25-3 2.25m3 0h3m-3 2.25l3-2.25-3-2.25M12 21a9 9 0 100-18 9 9 0 000 18z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                <span><img src="https://i.ibb.co/PGHHwt9b/FA9-A422-D-F370-4273-9-EDD-619-FAED808-E0.jpg"</span>
-            </div>
-        </div>
+            // Crear estrellas al montar
+            useEffect(() => {
+                const stars = [];
+                for(let i=0; i<150; i++) {
+                    stars.push({
+                        id: i,
+                        x: Math.random() * 100,
+                        y: Math.random() * 100,
+                        size: Math.random() * 2,
+                        duration: 2 + Math.random() * 5
+                    });
+                }
+                starsRef.current = stars;
+            }, []);
 
-        <!-- Nicknames -->
-        <div class="card">
-            <h2 class="font-dancing text-3xl mb-4">Mis nombres favoritos para ella 🙏</h2>
-            <p>"Mi mamacita linda" o "mi niña chiquita".</p>
-        </div>
-        
-        <!-- Details -->
-        <div class="card grid md:grid-cols-2 gap-8 items-center">
-            <div>
-                <h2 class="font-dancing text-3xl mb-4">Ella es Melany</h2>
-                <p>Tiene 28 años y su cumpleaños es el 31 de octubre, aunque ella odia ese día porque no puede celebrarlo tranquilamente.</p>
-            </div>
-            <div class="photo-placeholder">
-                <svg class="icon" fill="none" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                <span><img src="https://i.ibb.co/nsf94L2v/Gemini-Generated-Image-8h3kzr8h3kzr8h3k.png"</span>
-            </div>
-        </div>
+            // Configurar el analizador de audio al entrar
+            const initAudio = () => {
+                if (!audioRef.current) return;
+                
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const source = audioContext.createMediaElementSource(audioRef.current);
+                const analyzer = audioContext.createAnalyser();
+                
+                analyzer.fftSize = 256;
+                source.connect(analyzer);
+                analyzer.connect(audioContext.destination);
+                
+                analyzerRef.current = analyzer;
+                drawVisualizer();
+            };
 
-        <!-- Personality -->
-        <div class="card">
-            <h2 class="font-dancing text-3xl mb-4">Lo que me enamora de su ser</h2>
-            <p>Algo que me encanta de ella es su forma de ser y su increíble manera de hacerme sentir amado. Amo la forma en que expresa sus sentimientos y sí, hasta lo mucho que reniega rajando personas.</p>
-        </div>
+            const drawVisualizer = () => {
+                if (!analyzerRef.current || !canvasRef.current) return;
 
-        <!-- Funny Detail -->
-        <div class="card text-center">
-             <h2 class="font-dancing text-3xl mb-4">Efectos Secundarios de su Amor</h2>
-            <p class="italic">Me encanta cómo me hace sentir reacciones fisico-químicas en el sistema digestivo cada que me habla lindo (comprobado que no son lombrices).</p>
-        </div>
+                const canvas = canvasRef.current;
+                const ctx = canvas.getContext('2d');
+                const bufferLength = analyzerRef.current.frequencyBinCount;
+                const dataArray = new Uint8Array(bufferLength);
 
-        <!-- Little Things -->
-        <div class="card grid md:grid-cols-2 gap-8 items-center">
-             <div class="photo-placeholder">
-                <svg class="icon" fill="none" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M21 11.25v8.25a8.25 8.25 0 01-16.5 0v-8.25m16.5 0a8.25 8.25 0 00-16.5 0M12 12.75h.008v.008H12v-.008z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                <span><img src="https://i.ibb.co/rnQQryw/collagemel.png"</span>
-            </div>
-            <div>
-                <h2 class="font-dancing text-3xl mb-4">Pequeños Grandes Gestos</h2>
-                <p>Amo cada detallito que me hace. Cada uno es un tesoro. 💞</p>
-            </div>
-        </div>
+                const renderFrame = () => {
+                    animationRef.current = requestAnimationFrame(renderFrame);
+                    analyzerRef.current.getByteFrequencyData(dataArray);
 
-        <!-- Time Together -->
-        <div class="card">
-            <h2 class="font-dancing text-3xl mb-4">Nuestro Tiempo Juntos</h2>
-            <p>Amo compartir tiempo con ella, porque siempre que estamos juntos reímos a carcajadas con tanta bobada que decimos y que solo ella y yo entendemos. Nos divertimos demasiado (aunque ella piense que por la imagen del frasco medio lleno es aburrida -resentida que es-).</p>
-             <div class="photo-placeholder mt-6">
-                 <svg class="icon" fill="none" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M15.182 15.182a4.5 4.5 0 01-6.364 0M21 12a9 9 0 11-18 0 9 9 0 0118 0zM9 9.75h.008v.008H9V9.75zm6 0h.008v.008H15V9.75z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                <span><img src="https://i.ibb.co/mr420cqQ/Screenshot-2025-08-19-161739.png"</span>
-            </div>
-        </div>
+                    // Limpiar canvas
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        <!-- Things I Love -->
-        <div class="card">
-            <h2 class="font-dancing text-3xl mb-4">Cada parte de ella es mi favorita</h2>
-            <ul class="space-y-6">
-                <li class="flex items-start gap-4">
-                    <span class="text-2xl text-[#D9899A]">🧸</span>
-                    <p><strong>Amo su carita hermosa y tierna</strong>  💘</p>
-                </li>
-                <li class="flex items-start gap-4">
-                    <span class="text-2xl text-[#D9899A]">🤗</span>
-                    <p><strong>Amo sus cachetitos tan lindos</strong> (después de verla como bebé me enamoré más).</p>
-                </li>
-                 <li class="flex items-start gap-4">
-                    <span class="text-2xl text-[#D9899A]">🙏🏻</span>
-                    <p><strong>Amo su voz y amo hacer llamadas con ella (sobretodo cuando se le sale su cantadito Arequipeño)</strong> </p>
-                </li>
-                 <li class="flex items-start gap-4">
-                    <span class="text-2xl text-[#D9899A]">🙈</span>
-                    <p><strong>Amo sus ojitos hermosos</strong> y su nariz... todo en ella es ARTE.</p>
-                </li>
-            </ul>
-             <div class="photo-placeholder mt-6">
-                 <svg class="icon" fill="none" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM12.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM18.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                <span><img src="https://i.ibb.co/4RcdYWW2/PCIMG-2025-08-19-15-58-41.jpg"</span>
-            </div>
-        </div>
+                    const centerX = canvas.width / 2;
+                    const centerY = canvas.height / 2;
+                    const radius = 220; // Radio del círculo de barras
 
-        <!-- Our Future -->
-        <div class="card grid md:grid-cols-2 gap-8 items-center">
-            <div>
-                <h2 class="font-dancing text-3xl mb-4">Nuestro Futuro</h2>
-                <p>Amo nuestros sueños de tener dos criaturitas juntos (Emilia y Abigail) y nuestra casita. Es el futuro que más anhelo.</p>
-            </div>
-            <div class="photo-placeholder">
-                <svg class="icon" fill="none" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21m0 0h4.5V3.545M12.75 21h7.5V10.75M2.25 21h1.5m18 0h-18M2.25 9l4.5-1.636M18.75 3l-1.5.545m0 6.205l3 1m-3-1l-3-1m-3.75 0l3 1m-3-1l-3-1m12 5.25v-1.5m-6 1.5v-1.5m-6 0v-1.5m-6 0v-1.5m6 1.5v-1.5m6 0v-1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                <span><img src="https://i.ibb.co/5h9xWTv3/meltrip.jpg"</span>
-            </div>
-        </div>
+                    // Calcular intensidad de graves para el pulso de la tarjeta
+                    let bassIntensity = 0;
+                    for(let i=0; i<10; i++) bassIntensity += dataArray[i];
+                    bassIntensity = bassIntensity / 10;
+                    
+                    const scale = 1 + (bassIntensity / 512); 
+                    if(cardRef.current) {
+                        cardRef.current.style.transform = `scale(${scale})`;
+                        // Efecto RGB basado en intensidad
+                        const rgbLayers = cardRef.current.querySelectorAll('.rgb-layer');
+                        if (bassIntensity > 150) {
+                            rgbLayers[0].style.opacity = '0.5';
+                            rgbLayers[0].style.transform = `translate(-${bassIntensity/20}px, 0)`;
+                            rgbLayers[1].style.opacity = '0.5';
+                            rgbLayers[1].style.transform = `translate(${bassIntensity/20}px, 0)`;
+                        } else {
+                            rgbLayers.forEach(l => l.style.opacity = '0');
+                        }
+                    }
 
-        <!-- Summary -->
-        <div class="card text-center">
-             <h2 class="font-dancing text-3xl mb-4">En Resumen...</h2>
-            <p class="text-xl italic">Amo completico a mi Mel.rar porque en ese metro 50 viene comprimida la mujer más maravillosa y hermosa que he conocido. 💞</p>
-        </div>
+                    // Dibujar barras estilo Trap Nation
+                    for (let i = 0; i < bufferLength; i++) {
+                        const barHeight = (dataArray[i] / 255) * 120;
+                        const angle = (i / bufferLength) * Math.PI * 2;
+                        
+                        const xStart = centerX + Math.cos(angle) * radius;
+                        const yStart = centerY + Math.sin(angle) * radius;
+                        const xEnd = centerX + Math.cos(angle) * (radius + barHeight);
+                        const yEnd = centerY + Math.sin(angle) * (radius + barHeight);
 
-        <!-- Final Message -->
-        <div class="card final-message text-center">
-            <p class="text-2xl font-bold text-[#A6808C]">11:11 ∞∞/∞∞ Por Siemppre</p>
-            <div class="my-6 text-xl text-gray-600">
-                <p>Siempre mía</p>
-                <p> Siempre tuyo</p>
-                <p>  Siempre nuestro. 🖤🤍</p>
-            </div>
-            <div class="w-24 h-1 bg-[#F3D0D7] mx-auto rounded-full my-8"></div>
-            <p class="text-2xl font-bold text-[#D9899A] leading-relaxed">Te amo mi mamacita hermosa, perdón por todo lo malo y todo lo que pasó, y  aunque las palabras no sirvan mucho ahora porque mis actos reflejaron otra cosa, no quiero que te vayas de mi vida por una imprudencia y lo seguiré repitiendo siempre, eres lo que más amo, y lo que más deseo y ninguna se compara ni se acerca a ti, por eso no podría estar con nadie más, solamente contigo quiero estar, y esa foto no refleja nada de la realidad, ni pasó nada de lo que estás pensando. I'M SO SORRY.</p>
-        </div>
+                        ctx.beginPath();
+                        ctx.strokeStyle = `rgba(255, 255, 255, ${dataArray[i]/255 + 0.2})`;
+                        ctx.lineWidth = 3;
+                        ctx.lineCap = 'round';
+                        ctx.moveTo(xStart, yStart);
+                        ctx.lineTo(xEnd, yEnd);
+                        ctx.stroke();
+                    }
+                };
 
-    </div>
+                renderFrame();
+            };
 
+            const handleEnter = () => {
+                setHasEntered(true);
+                setIsPlaying(true);
+                initAudio();
+                audioRef.current.currentTime = 15;
+                audioRef.current.play();
+            };
+
+            const togglePlay = () => {
+                if (isPlaying) {
+                    audioRef.current.pause();
+                } else {
+                    audioRef.current.play();
+                }
+                setIsPlaying(!isPlaying);
+            };
+
+            return (
+                <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center relative overflow-hidden select-none">
+                    <audio ref={audioRef} src="musica.mp3" loop crossOrigin="anonymous" />
+
+                    {/* Estrellas dinámicas */}
+                    {starsRef.current.map(star => (
+                        <div 
+                            key={star.id} 
+                            className="star" 
+                            style={{ 
+                                left: `${star.x}%`, 
+                                top: `${star.y}%`, 
+                                width: `${star.size}px`, 
+                                height: `${star.size}px`, 
+                                '--d': `${star.duration}s` 
+                            }} 
+                        />
+                    ))}
+
+                    {!hasEntered ? (
+                        <div className="relative z-20 flex flex-col items-center space-y-12 animate-fade-in px-4 text-center">
+                            <h1 className="text-7xl md:text-9xl font-bold tracking-[0.4em] uppercase text-white">DEIS</h1>
+                            <button onClick={handleEnter} className="px-16 py-6 border border-white/30 font-light text-[10px] tracking-[0.6em] uppercase hover:border-white hover:bg-white hover:text-black transition-all duration-700 rounded-full">
+                                Initialize Bass
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="relative z-10 flex flex-col items-center w-full max-w-4xl h-screen justify-center">
+                            
+                            {/* Canvas del Visualizador Circular */}
+                            <canvas 
+                                ref={canvasRef} 
+                                width={800} 
+                                height={800} 
+                                className="absolute pointer-events-none opacity-80"
+                                style={{ transform: 'scale(0.85)' }}
+                            />
+
+                            <div ref={cardRef} className="card-wrapper w-full max-w-sm">
+                                <div className="rgb-layer rgb-cyan" />
+                                <div className="rgb-layer rgb-red" />
+                                
+                                <div className="glass-card">
+                                    <h1 className="text-4xl md:text-5xl font-bold tracking-[0.5em] text-center uppercase text-white">
+                                        DEIS
+                                    </h1>
+
+                                    <div className="relative w-64 h-64 border-[1px] border-white/20 overflow-hidden bg-zinc-950">
+                                        <img 
+                                            src="https://xatimg.com/image/fx2VKgs21uNd.jpg" 
+                                            alt="Deis" 
+                                            className="w-full h-full object-cover grayscale-[20%]" 
+                                        />
+                                    </div>
+
+                                    {/* Nombre de la canción abajo */}
+                                    <div className="text-center">
+                                        <p className="text-[7px] tracking-[0.4em] text-white/30 font-bold mb-1">CURRENT BROADCAST</p>
+                                        <p className="text-[9px] font-bold tracking-[0.1em] uppercase">6ix9ine, Nicki Minaj - FEFE</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Mini Player */}
+                    {hasEntered && (
+                        <div className={`fixed bottom-10 left-10 z-50 transition-all duration-1000 ${isPlayerExpanded ? 'w-80' : 'w-16'}`}>
+                            <div className="bg-white/[0.03] backdrop-blur-3xl border border-white/10 rounded-full overflow-hidden shadow-2xl">
+                                <div className="flex items-center p-5 cursor-pointer justify-between" onClick={() => setIsPlayerExpanded(!isPlayerExpanded)}>
+                                    <div className="flex items-center gap-5">
+                                        <div className={`p-1.5 border border-white/10 rounded-full ${isPlaying ? 'animate-spin-slow' : ''}`}>
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4"><path d="M9 18V5l12-2v13" /><circle cx="6" cy="18" r="3" /><circle cx="18" cy="16" r="3" /></svg>
+                                        </div>
+                                        {isPlayerExpanded && (
+                                            <div className="flex flex-col animate-fade-in text-white overflow-hidden">
+                                                <span className="text-[7px] uppercase tracking-[0.4em] text-white/40 font-bold mb-1">Reactive System</span>
+                                                <span className="text-[9px] font-bold tracking-[0.1em] truncate max-w-[180px]">FEFE ft. Murda Beatz</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                                {isPlayerExpanded && (
+                                    <div className="px-6 pb-8 flex items-center justify-center animate-fade-in">
+                                        <button onClick={(e) => { e.stopPropagation(); togglePlay(); }} className="w-14 h-14 border border-white/5 rounded-full flex items-center justify-center hover:bg-white hover:text-black transition-all">
+                                            {isPlaying ? (
+                                                <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5"><rect x="6" y="4" width="4" height="16" /><rect x="14" y="4" width="4" height="16" /></svg>
+                                            ) : (
+                                                <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 ml-1"><polygon points="5 3 19 12 5 21 5 3" /></svg>
+                                            )}
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
 </body>
 </html>
