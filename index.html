@@ -69,16 +69,25 @@
             box-shadow: 0 0 25px var(--river-red), 0 0 50px var(--river-white);
         }
 
-        /* Video de Fondo */
-        #bg-video {
+        /* Video de Fondo / GIF Fallback */
+        #bg-container {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            object-fit: cover;
             z-index: -1;
-            display: none; /* Se activa al entrar */
+            background-color: black;
+        }
+
+        #bg-video, #bg-gif {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
         }
 
         /* Contenido Principal */
@@ -103,7 +112,7 @@
             z-index: 10;
         }
 
-        /* Liesel con Efecto Wave, Gradient y Glow */
+        /* Liesel con Efecto Wave, Gradient y Glow Mejorado */
         .title-3d {
             font-size: 8rem;
             text-transform: uppercase;
@@ -112,22 +121,23 @@
             margin-bottom: 10px;
             position: relative;
             
-            /* Gradient animado */
+            /* Gradient animado Blanco y Rojo */
             background: linear-gradient(
                 90deg, 
-                #fff 0%, 
+                #ffffff 0%, 
                 #e30613 25%, 
-                #fff 50%, 
+                #ffffff 50%, 
                 #e30613 75%, 
-                #fff 100%
+                #ffffff 100%
             );
             background-size: 200% auto;
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
             
-            filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.5));
-            animation: flowGradient 4s linear infinite, waveEffect 3s ease-in-out infinite;
+            /* Glow intenso */
+            filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.4)) drop-shadow(0 0 30px rgba(227, 6, 19, 0.3));
+            animation: flowGradient 3s linear infinite, waveEffect 4s ease-in-out infinite;
         }
 
         @keyframes flowGradient {
@@ -136,8 +146,9 @@
         }
 
         @keyframes waveEffect {
-            0%, 100% { transform: scale(1) skewX(0deg); }
-            50% { transform: scale(1.05) skewX(2deg); filter: drop-shadow(0 0 25px rgba(227, 6, 19, 0.8)); }
+            0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+            25% { transform: translateY(-5px) rotate(1deg) scale(1.02); }
+            75% { transform: translateY(5px) rotate(-1deg) scale(0.98); }
         }
 
         /* Letrero Albiceleste */
@@ -171,6 +182,7 @@
             z-index: 20;
         }
 
+        /* Frase en Celeste Cielo */
         .quote {
             font-family: 'Caveat', cursive;
             color: var(--sky-blue);
@@ -185,7 +197,7 @@
             position: fixed;
             bottom: 20px;
             left: 20px;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(10px);
             border: 2px solid white;
             border-radius: 15px;
@@ -241,11 +253,14 @@
 </head>
 <body>
 
-    <!-- VIDEO DE FONDO (Reemplaza 'video_monumental.mp4' por tu archivo) -->
-    <video id="bg-video" loop muted playsinline>
-        <source src="video_monumental.mp4" type="video/mp4">
-        Tu navegador no soporta videos.
-    </video>
+    <div id="bg-container">
+        <!-- VIDEO: Intentará cargar este archivo -->
+        <video id="bg-video" loop muted playsinline>
+            <source src="video_monumental.mp4" type="video/mp4">
+        </video>
+        <!-- GIF: Actuará como respaldo si el video falla -->
+        <img id="bg-gif" src="https://i.ibb.co/TBw05GWn/mudomental.gif" alt="Fondo Monumental">
+    </div>
 
     <!-- PANTALLA DE INTRO -->
     <div id="intro-screen">
@@ -288,16 +303,33 @@
         const mainSite = document.getElementById('main-site');
         const enterBtn = document.getElementById('enter-btn');
         const video = document.getElementById('bg-video');
+        const gif = document.getElementById('bg-gif');
         const music = document.getElementById('bg-music');
         const player = document.getElementById('music-player');
         const playPauseBtn = document.getElementById('play-pause');
         const volumeSlider = document.getElementById('volume');
         const container = document.getElementById('animation-container');
 
+        // Manejador de errores para el video
+        video.onerror = function() {
+            console.log("El video no pudo cargarse, usando GIF de respaldo.");
+            video.style.display = 'none';
+            gif.style.display = 'block';
+        };
+
         enterBtn.addEventListener('click', () => {
-            // Activar video y música
+            // Intentar reproducir video
             video.style.display = 'block';
-            video.play();
+            const playPromise = video.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    // Si el video falla al reproducirse, mostrar el GIF
+                    video.style.display = 'none';
+                    gif.style.display = 'block';
+                });
+            }
+
             music.play().catch(e => console.log("Audio play prevented", e));
 
             intro.style.opacity = '0';
