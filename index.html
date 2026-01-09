@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -69,7 +68,7 @@
             box-shadow: 0 0 25px var(--river-red), 0 0 50px var(--river-white);
         }
 
-        /* Video de Fondo / GIF Fallback */
+        /* Contenedor de Fondo */
         #bg-container {
             position: fixed;
             top: 0;
@@ -87,7 +86,8 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            display: none;
+            opacity: 0;
+            transition: opacity 1s ease;
         }
 
         /* Contenido Principal */
@@ -112,7 +112,7 @@
             z-index: 10;
         }
 
-        /* Liesel con Efecto Wave, Gradient y Glow Mejorado */
+        /* Liesel con Efecto Wave, Gradient y Glow */
         .title-3d {
             font-size: 8rem;
             text-transform: uppercase;
@@ -120,8 +120,6 @@
             line-height: 1;
             margin-bottom: 10px;
             position: relative;
-            
-            /* Gradient animado Blanco y Rojo */
             background: linear-gradient(
                 90deg, 
                 #ffffff 0%, 
@@ -134,8 +132,6 @@
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
-            
-            /* Glow intenso */
             filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.4)) drop-shadow(0 0 30px rgba(227, 6, 19, 0.3));
             animation: flowGradient 3s linear infinite, waveEffect 4s ease-in-out infinite;
         }
@@ -151,7 +147,6 @@
             75% { transform: translateY(5px) rotate(-1deg) scale(0.98); }
         }
 
-        /* Letrero Albiceleste */
         .arg-banner {
             background: linear-gradient(to bottom, var(--arg-blue) 33%, white 33%, white 66%, var(--arg-blue) 66%);
             display: flex;
@@ -182,7 +177,6 @@
             z-index: 20;
         }
 
-        /* Frase en Celeste Cielo */
         .quote {
             font-family: 'Caveat', cursive;
             color: var(--sky-blue);
@@ -254,11 +248,11 @@
 <body>
 
     <div id="bg-container">
-        <!-- VIDEO: Intentará cargar este archivo -->
-        <video id="bg-video" loop muted playsinline>
-            <source src="video_monumental.mp4" type="video/mp4">
+        <!-- VIDEO: Aseguramos que cargue con muted y playsinline -->
+        <video id="bg-video" loop muted playsinline preload="auto">
+            <source src="video.mp4" type="video/mp4">
         </video>
-        <!-- GIF: Actuará como respaldo si el video falla -->
+        <!-- GIF de respaldo -->
         <img id="bg-gif" src="https://i.ibb.co/TBw05GWn/mudomental.gif" alt="Fondo Monumental">
     </div>
 
@@ -310,28 +304,35 @@
         const volumeSlider = document.getElementById('volume');
         const container = document.getElementById('animation-container');
 
-        // Manejador de errores para el video
-        video.onerror = function() {
-            console.log("El video no pudo cargarse, usando GIF de respaldo.");
-            video.style.display = 'none';
+        // Función para cambiar al GIF si el video falla
+        function useGifFallback() {
+            video.style.opacity = '0';
+            gif.style.opacity = '1';
             gif.style.display = 'block';
-        };
+        }
+
+        video.addEventListener('error', useGifFallback);
 
         enterBtn.addEventListener('click', () => {
-            // Intentar reproducir video
-            video.style.display = 'block';
+            // Intentamos reproducir el video primero
             const playPromise = video.play();
             
             if (playPromise !== undefined) {
-                playPromise.catch(error => {
-                    // Si el video falla al reproducirse, mostrar el GIF
-                    video.style.display = 'none';
-                    gif.style.display = 'block';
+                playPromise.then(() => {
+                    // Si reproduce, lo mostramos
+                    video.style.opacity = '1';
+                }).catch(error => {
+                    console.log("Error al reproducir video, usando GIF.");
+                    useGifFallback();
                 });
+            } else {
+                useGifFallback();
             }
 
+            // Reproducir música
             music.play().catch(e => console.log("Audio play prevented", e));
 
+            // Desvanecer pantalla de intro
             intro.style.opacity = '0';
             setTimeout(() => {
                 intro.style.display = 'none';
@@ -341,6 +342,7 @@
                     mainSite.style.opacity = '1';
                 }, 50);
             }, 1000);
+
             startAnimations();
         });
 
