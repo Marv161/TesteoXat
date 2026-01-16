@@ -1,64 +1,145 @@
-<!DOCTYPE html>
+
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Beige - ライトブラウン</title>
+    <title>Beige</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&family=Noto+Sans+JP:wght@300;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&family=Noto+Sans+JP:wght@300;700;900&display=swap');
 
         body {
             background-color: black;
             color: white;
             font-family: 'Inter', sans-serif;
             margin: 0;
+            overflow: hidden;
+        }
+
+        /* --- PANTALLA DE INTRODUCCIÓN --- */
+        #intro-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
+            background-color: black;
+            transition: opacity 1s ease, visibility 1s;
         }
 
-        /* Efecto de parpadeo (flicker) para el nombre */
-        @keyframes flicker {
-            0%, 18%, 22%, 25%, 53%, 57%, 100% {
-                opacity: 1;
-                text-shadow: 0 0 4px #fff, 0 0 11px #fff;
-            }
-            20%, 24%, 55% {
-                opacity: 0.3;
-                text-shadow: none;
-            }
+        /* Rectángulo 9:16 */
+        .intro-card {
+            position: relative;
+            aspect-ratio: 9 / 16;
+            width: min(90vw, calc(85vh * 9 / 16));
+            background-image: url('https://i.pinimg.com/1200x/30/d0/3d/30d03dbeeaa7d1c265900bebea7d3b4b.jpg');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
         }
 
-        .flicker-text {
-            animation: flicker 3s infinite;
+        /* Contenedor del recorte para el Glow Blanco */
+        .cutout-wrapper {
+            width: 100%;
+            height: 60%;
+            filter: drop-shadow(0 0 10px rgba(255,255,255,0.8)) drop-shadow(0 0 2px white);
+            margin-bottom: 2rem;
+            z-index: 10;
         }
 
-        /* Estilo para el texto japonés con el efecto de rotación de degradado y glow */
+        /* El Recorte: Conectado al borde izquierdo, irregularidades en los lados del triángulo */
+        .cutout-frame {
+            width: 100%;
+            height: 100%;
+            background-image: url('https://i.pinimg.com/736x/45/5a/2d/455a2d65ae98c00af4733bc2a34e323b.jpg');
+            background-size: cover;
+            background-position: center;
+            
+            /* Clip-path: Base plana a la izquierda (0%), rasgado en los lados inclinados */
+            clip-path: polygon(
+                0% 0%, 
+                0% 100%, 
+                25% 92%, 35% 85%, 45% 78%, 55% 72%, 65% 68%, 75% 62%, 85% 58%, 95% 52%, 100% 50%,
+                95% 48%, 85% 42%, 75% 38%, 65% 32%, 55% 28%, 45% 22%, 35% 15%, 25% 8%
+            );
+            position: relative;
+        }
+
+        /* Botón ENTRAR: Blanco con efecto de movimiento de color interno */
+        .enter-button {
+            background: linear-gradient(
+                120deg, 
+                #ffffff 0%, 
+                #ffffff 40%, 
+                #a0a0a0 50%, 
+                #ffffff 60%, 
+                #ffffff 100%
+            );
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-size: 1.8rem;
+            font-weight: 900;
+            letter-spacing: 0.6em;
+            text-transform: uppercase;
+            cursor: pointer;
+            border: none;
+            padding: 10px;
+            filter: drop-shadow(0 0 8px rgba(255,255,255,0.4));
+            animation: textShine 3s linear infinite, float 3s ease-in-out infinite;
+            transition: transform 0.3s ease;
+        }
+
+        .enter-button:hover {
+            transform: scale(1.1);
+            filter: drop-shadow(0 0 12px rgba(255,255,255,0.9));
+        }
+
+        @keyframes textShine {
+            to { background-position: 200% center; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* --- CONTENIDO PRINCIPAL --- */
+        #main-content {
+            opacity: 0;
+            transition: opacity 1.5s ease;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
         .vertical-text {
             writing-mode: vertical-rl;
             text-orientation: mixed;
             font-family: 'Noto Sans JP', sans-serif;
-            
-            background: linear-gradient(
-                90deg, 
-                #fcfcfc 0%, 
-                #9c9695 15%, 
-                #fcfcfc 30%, 
-                #9c9695 45%, 
-                #fcfcfc 60%, 
-                #9c9695 75%, 
-                #ffe3ef 90%, 
-                #9c9695 100%
-            );
+            background: linear-gradient(90deg, #fcfcfc 0%, #9c9695 15%, #fcfcfc 30%, #9c9695 45%, #fcfcfc 60%, #9c9695 75%, #ffe3ef 90%, #9c9695 100%);
             background-size: 200% 200%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            
             filter: drop-shadow(0 0 12px rgba(0, 0, 1, 1));
             animation: gradient-rotation 6s linear infinite;
         }
+
+        @keyframes flicker {
+            0%, 18%, 22%, 25%, 53%, 57%, 100% { opacity: 1; text-shadow: 0 0 4px #fff, 0 0 11px #fff; }
+            20%, 24%, 55% { opacity: 0.3; text-shadow: none; }
+        }
+
+        .flicker-text { animation: flicker 3s infinite; }
 
         @keyframes gradient-rotation {
             0% { background-position: 0% 50%; }
@@ -66,92 +147,80 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* Transiciones suaves para los efectos de hover cruzado */
-        .fade-target {
-            transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), filter 0.6s ease;
-        }
-
-        /* Hover: Imagen -> Texto se oscurece */
-        .container-site:has(.image-area:hover) .text-area {
-            opacity: 0.1;
-            filter: blur(2px) grayscale(100%);
-        }
-
-        /* Hover: Texto -> Imagen se oscurece */
-        .container-site:has(.text-area:hover) .image-area {
-            opacity: 0.2;
-            filter: grayscale(100%) brightness(0.3);
-        }
-
-        .main-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+        .fade-target { transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), filter 0.6s ease; }
+        .container-site:has(.image-area:hover) .text-area { opacity: 0.15; filter: blur(2px); }
+        .container-site:has(.text-area:hover) .image-area { opacity: 0.25; filter: brightness(0.4); }
 
         @media (max-width: 768px) {
-            .container-site {
-                flex-direction: column-reverse;
-                height: auto;
-                max-height: none;
-                margin: 20px;
-            }
-            .text-area, .image-area {
-                width: 100%;
-                height: 450px;
-            }
-            .vertical-text {
-                writing-mode: horizontal-tb;
-            }
+            .container-site { flex-direction: column-reverse; height: auto; }
+            .text-area, .image-area { width: 100%; height: 400px; }
         }
     </style>
 </head>
-<body class="p-4 md:p-12">
+<body>
 
-    <!-- Contenedor Principal Centrado -->
-    <div class="container-site flex w-full max-w-5xl h-[75vh] bg-black shadow-[0_0_80px_rgba(0,0,0,1)] overflow-hidden border border-white/10">
-        
-        <!-- Sección de Texto (Izquierda) -->
-        <div class="text-area fade-target w-1/2 flex flex-col relative p-8 md:p-14 bg-black">
-            
-            <!-- Texto Vertical Superior -->
-            <div class="absolute right-6 top-8">
-                <h2 class="vertical-text text-5xl md:text-7xl font-bold tracking-tighter">
-                    ライトブラウン
-                </h2>
+    <!-- PANTALLA DE INTRODUCCIÓN -->
+    <div id="intro-screen">
+        <div class="intro-card" onclick="enterSite()">
+            <!-- Recorte conectado al borde izquierdo con laterales rasgados -->
+            <div class="cutout-wrapper">
+                <div class="cutout-frame"></div>
             </div>
+            
+            <!-- Botón Entrar (Texto Blanco con brillo animado) -->
+            <button class="enter-button">
+                ENTRAR
+            </button>
+        </div>
+    </div>
 
-            <!-- Información Principal Inferior -->
-            <div class="mt-auto relative z-10">
-                <!-- Se ha quitado el texto "Archive" -->
-                
-                <!-- Nombre cambiado a Beige con efecto flicker -->
-                <h1 class="flicker-text text-6xl md:text-8xl font-bold mb-3 tracking-tighter leading-none">
-                    Beige
-                </h1>
-                
-                <div class="h-[1px] w-16 bg-white/40 mb-6"></div>
-                
-                <div class="space-y-4">
-                    <p class="text-3xl font-light tracking-[0.4em] text-white/90">
-                        444
-                    </p>
-                    <!-- Se ha quitado la frase de abajo -->
+    <!-- CONTENIDO PRINCIPAL -->
+    <main id="main-content">
+        <div class="container-site flex w-full max-w-5xl h-[75vh] bg-black shadow-[0_0_80px_rgba(0,0,0,1)] overflow-hidden border border-white/10">
+            
+            <!-- Sección de Texto (Izquierda) -->
+            <div class="text-area fade-target w-1/2 flex flex-col relative p-8 md:p-14 bg-black">
+                <div class="absolute right-6 top-8">
+                    <h2 class="vertical-text text-5xl md:text-7xl font-bold tracking-tighter">
+                        ライトブラウン
+                    </h2>
+                </div>
+
+                <div class="mt-auto relative z-10">
+                    <h1 class="flicker-text text-6xl md:text-8xl font-bold mb-3 tracking-tighter leading-none">
+                        Beige
+                    </h1>
+                    <div class="h-[1px] w-16 bg-white/40 mb-6"></div>
+                    <div class="space-y-4">
+                        <p class="text-3xl font-light tracking-[0.4em] text-white/90">444</p>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Sección de Imagen (Derecha) -->
-        <div class="image-area fade-target w-1/2 h-full overflow-hidden">
-            <img 
-                src="https://xatimg.com/image/tMLjMikLMclC.jpg" 
-                alt="Imagen" 
-                class="main-image"
-                onerror="this.src='https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=1000&auto=format&fit=crop'"
-            >
+            <!-- Sección de Imagen (Derecha) -->
+            <div class="image-area fade-target w-1/2 h-full overflow-hidden">
+                <img 
+                    src="https://xatimg.com/image/tMLjMikLMclC.jpg" 
+                    alt="Imagen Principal" 
+                    class="w-full h-full object-cover"
+                >
+            </div>
         </div>
+    </main>
 
-    </div>
+    <script>
+        function enterSite() {
+            const intro = document.getElementById('intro-screen');
+            const main = document.getElementById('main-content');
+            
+            intro.style.opacity = '0';
+            setTimeout(() => {
+                intro.style.visibility = 'hidden';
+                main.style.opacity = '1';
+                document.body.style.overflow = 'auto';
+            }, 800);
+        }
+    </script>
 
 </body>
 </html>
