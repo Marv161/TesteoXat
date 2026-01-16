@@ -1,390 +1,119 @@
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>River Plate - Liesel</title>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Caveat:wght@700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <title>Lulú - ライトブラウン</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root {
-            --river-red: #e30613;
-            --river-white: #ffffff;
-            --arg-blue: #74ACDF;
-            --sky-blue: #87CEEB;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&family=Noto+Sans+JP:wght@300;700&display=swap');
 
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            overflow: hidden;
-            background: #000;
-            font-family: 'Bebas Neue', cursive;
-        }
-
-        /* Pantalla de Intro */
-        #intro-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url('https://i.ibb.co/mrsLjZvY/entrada.jpg') no-repeat center center;
-            background-size: cover;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            transition: opacity 1s ease-in-out, visibility 1s;
-        }
-
-        .intro-title {
-            color: white;
-            font-size: 4rem;
-            text-align: center;
-            text-shadow: 4px 4px 10px rgba(0,0,0,0.8), 0 0 20px var(--river-red);
-            margin-bottom: 2rem;
-            padding: 0 20px;
-        }
-
-        .enter-btn {
-            background: var(--river-white);
-            color: var(--river-red);
-            padding: 15px 50px;
-            font-size: 2rem;
-            border: 4px solid var(--river-red);
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 15px var(--river-white), 0 0 30px var(--river-red);
-            text-transform: uppercase;
-        }
-
-        .enter-btn:hover {
-            transform: scale(1.1);
-            background: var(--river-red);
-            color: var(--river-white);
-            box-shadow: 0 0 25px var(--river-red), 0 0 50px var(--river-white);
-        }
-
-        /* Contenedor de Fondo */
-        #bg-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
+        body {
             background-color: black;
-        }
-
-        #bg-video, #bg-gif {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            opacity: 0;
-            transition: opacity 1s ease;
-        }
-
-        /* Contenido Principal */
-        #main-site {
-            display: none;
-            height: 100%;
-            opacity: 0;
-            transition: opacity 1.5s ease-in;
-        }
-
-        .overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.4);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 10;
-        }
-
-        /* Liesel con Efecto Wave, Gradient y Glow */
-        .title-3d {
-            font-size: 8rem;
-            text-transform: uppercase;
-            letter-spacing: 6px;
-            line-height: 1;
-            margin-bottom: 10px;
-            position: relative;
-            background: linear-gradient(
-                90deg, 
-                #ffffff 0%, 
-                #e30613 25%, 
-                #ffffff 50%, 
-                #e30613 75%, 
-                #ffffff 100%
-            );
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.4)) drop-shadow(0 0 30px rgba(227, 6, 19, 0.3));
-            animation: flowGradient 3s linear infinite, waveEffect 4s ease-in-out infinite;
-        }
-
-        @keyframes flowGradient {
-            0% { background-position: 0% center; }
-            100% { background-position: 200% center; }
-        }
-
-        @keyframes waveEffect {
-            0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
-            25% { transform: translateY(-5px) rotate(1deg) scale(1.02); }
-            75% { transform: translateY(5px) rotate(-1deg) scale(0.98); }
-        }
-
-        .arg-banner {
-            background: linear-gradient(to bottom, var(--arg-blue) 33%, white 33%, white 66%, var(--arg-blue) 66%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 8px 40px;
-            border-radius: 50px;
-            border: 2px solid white;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5), 0 0 10px var(--arg-blue);
-            margin-bottom: 30px;
-        }
-
-        .stars-container {
-            display: flex;
-            gap: 15px;
-            color: #FFD700;
-            font-size: 2.2rem;
-            text-shadow: 0 0 10px rgba(0,0,0,0.5), 0 0 15px rgba(255, 215, 0, 0.8);
-        }
-
-        .main-frame {
-            border: 8px solid white;
-            box-shadow: 0 0 30px 15px rgba(255, 0, 0, 0.8);
-            border-radius: 4px;
-            max-width: 90%;
-            max-height: 45vh;
-            position: relative;
-            z-index: 20;
-        }
-
-        .quote {
-            font-family: 'Caveat', cursive;
-            color: var(--sky-blue);
-            font-size: 3rem;
-            margin-top: 25px;
-            text-shadow: 2px 2px 10px rgba(0,0,0,0.9);
-            font-weight: bold;
-        }
-
-        /* Reproductor */
-        #music-player {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(10px);
-            border: 2px solid white;
-            border-radius: 15px;
-            padding: 10px 20px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            z-index: 2000;
-            box-shadow: 0 0 20px rgba(255, 0, 0, 0.4);
-            display: none;
-        }
-
-        .player-img {
-            width: 60px;
-            height: 60px;
-            border-radius: 8px;
-            border: 2px solid var(--river-red);
-            object-fit: cover;
-        }
-
-        .ctrl-btn {
-            background: var(--river-red);
             color: white;
-            border: 1px solid white;
-            border-radius: 50%;
-            width: 32px;
-            height: 32px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            font-size: 0.8rem;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
         }
 
-        /* Partículas */
-        .flying-item {
-            position: absolute;
-            pointer-events: none;
-            z-index: 5;
-            user-select: none;
+        .vertical-text {
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            font-family: 'Noto Sans JP', sans-serif;
         }
 
-        @keyframes fly {
-            0% { transform: translate(0, 110vh) rotate(0deg); opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { transform: translate(var(--translateX), -10vh) rotate(var(--rotate)); opacity: 0; }
+        /* Transiciones suaves para los efectos */
+        .fade-target {
+            transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), filter 0.6s ease;
         }
 
-        .red-balloon { color: #ff0000; font-size: 3.5rem; filter: drop-shadow(0 0 8px rgba(255,0,0,0.6)); }
-        .white-ball { color: white; font-size: 2rem; filter: drop-shadow(0 0 10px rgba(255,255,255,0.7)); opacity: 0.8; }
+        /* Lógica de hover cruzado dentro del contenedor central */
+        .container-site:has(.image-area:hover) .text-area {
+            opacity: 0.15;
+            filter: blur(1px);
+        }
+
+        .container-site:has(.text-area:hover) .image-area {
+            opacity: 0.25;
+            filter: grayscale(80%) brightness(0.5);
+        }
+
+        .main-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Ajustes responsivos */
+        @media (max-width: 768px) {
+            .container-site {
+                flex-direction: column;
+                height: auto;
+                max-height: none;
+            }
+            .text-area, .image-area {
+                width: 100%;
+                height: 400px;
+            }
+            .vertical-text {
+                writing-mode: horizontal-tb;
+            }
+        }
     </style>
 </head>
-<body>
+<body class="min-h-screen flex items-center justify-center p-4 md:p-12">
 
-    <div id="bg-container">
-        <!-- VIDEO: Aseguramos que cargue con muted y playsinline -->
-        <video id="bg-video" loop muted playsinline preload="auto">
-            <source src="video.mp4" type="video/mp4">
-        </video>
-        <!-- GIF de respaldo -->
-        <img id="bg-gif" src="https://i.ibb.co/TBw05GWn/mudomental.gif" alt="Fondo Monumental">
-    </div>
-
-    <!-- PANTALLA DE INTRO -->
-    <div id="intro-screen">
-        <h2 class="intro-title">Bienvenido a Club Atlético River Plate</h2>
-        <button class="enter-btn" id="enter-btn">Entrar</button>
-    </div>
-
-    <!-- REPRODUCTOR -->
-    <div id="music-player">
-        <img src="https://i.ibb.co/ynnbKcNX/image.png" alt="Álbum" class="player-img">
-        <div class="player-controls">
-            <span style="color: white; font-size: 1rem; font-family: 'Montserrat', sans-serif; font-weight: bold; letter-spacing: 1px;">Welcome to Derry</span>
-            <div class="flex gap-2 mt-1">
-                <button class="ctrl-btn" id="play-pause">II</button>
-                <input type="range" id="volume" min="0" max="1" step="0.1" value="0.5" style="width: 70px; accent-color: #e30613;">
-            </div>
+    <!-- Contenedor Principal Centrado -->
+    <div class="container-site flex w-full max-w-6xl h-[80vh] bg-zinc-950 shadow-[0_0_50px_rgba(0,0,0,0.5)] overflow-hidden border border-white/5">
+        
+        <!-- Sección de Imagen (Izquierda) -->
+        <div class="image-area fade-target w-1/2 h-full overflow-hidden">
+            <img 
+                src="https://xatimg.com/image/tMLjMikLMclC.jpg" 
+                alt="Imagen de Lulú" 
+                class="main-image"
+                onerror="this.src='https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=1000'"
+            >
         </div>
-        <audio id="bg-music" loop>
-            <source src="musica.mp3" type="audio/mpeg">
-        </audio>
-    </div>
 
-    <!-- SITIO PRINCIPAL -->
-    <div id="main-site">
-        <div class="overlay">
-            <h1 class="title-3d">Liesel</h1>
-            <div class="arg-banner">
-                <div class="stars-container">
-                    <span>★</span><span>★</span><span>★</span>
+        <!-- Sección de Texto (Derecha) -->
+        <div class="text-area fade-target w-1/2 flex flex-col relative p-8 md:p-16 justify-between items-start bg-black">
+            
+            <!-- Texto Vertical Superior -->
+            <div class="w-full flex justify-end">
+                <h2 class="vertical-text text-5xl md:text-7xl font-bold tracking-tighter opacity-90 text-white">
+                    ライトブラウン
+                </h2>
+            </div>
+
+            <!-- Información Principal Inferior -->
+            <div class="z-10 text-left w-full mt-auto">
+                <div class="mb-4">
+                    <span class="text-[10px] tracking-[0.6em] uppercase opacity-30">Profile Archive</span>
+                </div>
+                
+                <h1 class="text-6xl md:text-8xl font-bold mb-2 tracking-tighter">
+                    Lulú
+                </h1>
+                
+                <div class="h-[1px] w-12 bg-white/20 mb-6"></div>
+                
+                <div class="space-y-4">
+                    <p class="text-xl font-light tracking-[0.3em] uppercase opacity-80">
+                        JAPANESE
+                    </p>
+                    <p class="text-sm font-light opacity-50 leading-relaxed max-w-xs italic">
+                        "La belleza reside en la simplicidad y la armonía de los detalles silenciosos."
+                    </p>
                 </div>
             </div>
-            <img src="https://i.ibb.co/FLC5ZSgP/gallardo.jpg" alt="Marcelo Gallardo" class="main-frame">
-            <p class="quote">"Si llorás, que sea de risa"</p>
+
+            <!-- Decoración de pie -->
+            <div class="absolute bottom-6 right-8">
+                <p class="text-[9px] tracking-[0.4em] uppercase opacity-20">2024 © Studio</p>
+            </div>
         </div>
-        <div id="animation-container"></div>
+
     </div>
 
-    <script>
-        const intro = document.getElementById('intro-screen');
-        const mainSite = document.getElementById('main-site');
-        const enterBtn = document.getElementById('enter-btn');
-        const video = document.getElementById('bg-video');
-        const gif = document.getElementById('bg-gif');
-        const music = document.getElementById('bg-music');
-        const player = document.getElementById('music-player');
-        const playPauseBtn = document.getElementById('play-pause');
-        const volumeSlider = document.getElementById('volume');
-        const container = document.getElementById('animation-container');
-
-        // Función para cambiar al GIF si el video falla
-        function useGifFallback() {
-            video.style.opacity = '0';
-            gif.style.opacity = '1';
-            gif.style.display = 'block';
-        }
-
-        video.addEventListener('error', useGifFallback);
-
-        enterBtn.addEventListener('click', () => {
-            // Intentamos reproducir el video primero
-            const playPromise = video.play();
-            
-            if (playPromise !== undefined) {
-                playPromise.then(() => {
-                    // Si reproduce, lo mostramos
-                    video.style.opacity = '1';
-                }).catch(error => {
-                    console.log("Error al reproducir video, usando GIF.");
-                    useGifFallback();
-                });
-            } else {
-                useGifFallback();
-            }
-
-            // Reproducir música
-            music.play().catch(e => console.log("Audio play prevented", e));
-
-            // Desvanecer pantalla de intro
-            intro.style.opacity = '0';
-            setTimeout(() => {
-                intro.style.display = 'none';
-                mainSite.style.display = 'block';
-                player.style.display = 'flex';
-                setTimeout(() => {
-                    mainSite.style.opacity = '1';
-                }, 50);
-            }, 1000);
-
-            startAnimations();
-        });
-
-        playPauseBtn.addEventListener('click', () => {
-            if (music.paused) {
-                music.play();
-                playPauseBtn.innerText = 'II';
-            } else {
-                music.pause();
-                playPauseBtn.innerText = '►';
-            }
-        });
-
-        volumeSlider.addEventListener('input', (e) => {
-            music.volume = e.target.value;
-        });
-
-        const items = [
-            { type: 'text', content: '🎈', class: 'red-balloon' },
-            { type: 'text', content: '⚪', class: 'white-ball' }
-        ];
-
-        function spawnItem() {
-            const itemConfig = items[Math.floor(Math.random() * items.length)];
-            const div = document.createElement('div');
-            div.className = 'flying-item ' + (itemConfig.class || '');
-            div.innerText = itemConfig.content;
-            const startX = Math.random() * 100;
-            const translateX = (Math.random() - 0.5) * 300;
-            const rotate = Math.random() * 360;
-            const duration = 8 + Math.random() * 8;
-            div.style.left = startX + 'vw';
-            div.style.setProperty('--translateX', translateX + 'px');
-            div.style.setProperty('--rotate', rotate + 'deg');
-            div.style.animation = `fly ${duration}s linear forwards`;
-            container.appendChild(div);
-            setTimeout(() => div.remove(), duration * 1000);
-        }
-
-        function startAnimations() {
-            setInterval(spawnItem, 600);
-        }
-    </script>
 </body>
 </html>
