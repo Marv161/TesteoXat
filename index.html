@@ -1,226 +1,463 @@
-
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Beige</title>
+    <title>Project: MARVIN // FINAL</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rubik+Glitch&family=Orbitron:wght@900&display=swap" rel="stylesheet">
+    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&family=Noto+Sans+JP:wght@300;700;900&display=swap');
-
+        /* --- ESTÉTICA GENERAL --- */
         body {
-            background-color: black;
-            color: white;
-            font-family: 'Inter', sans-serif;
-            margin: 0;
+            background-color: #050505;
+            color: #dcdcdc;
+            font-family: 'Share Tech Mono', monospace;
             overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-evenly; 
         }
 
-        /* --- PANTALLA DE INTRODUCCIÓN --- */
-        #intro-screen {
+        /* --- FONDO DE SALA --- */
+        .room-bg {
             position: fixed;
             inset: 0;
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: black;
-            transition: opacity 1s ease, visibility 1s;
+            background: 
+                linear-gradient(rgba(0,0,0,0.9), rgba(0,0,0,0.85)),
+                repeating-linear-gradient(0deg, transparent, transparent 1px, #1a0520 1px, #1a0520 2px);
+            z-index: -2;
         }
 
-        /* Rectángulo 9:16 */
-        .intro-card {
-            position: relative;
-            aspect-ratio: 9 / 16;
-            width: min(90vw, calc(85vh * 9 / 16));
-            background-image: url('https://i.pinimg.com/1200x/30/d0/3d/30d03dbeeaa7d1c265900bebea7d3b4b.jpg');
-            background-size: cover;
-            background-position: center;
+        /* --- CABECERA --- */
+        .header-section {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 0 50px rgba(0, 0, 0, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            overflow: hidden;
-        }
-
-        /* Contenedor del recorte para el Glow Blanco */
-        .cutout-wrapper {
+            z-index: 20;
             width: 100%;
-            height: 60%;
-            filter: drop-shadow(0 0 10px rgba(255,255,255,0.8)) drop-shadow(0 0 2px white);
-            margin-bottom: 2rem;
-            z-index: 10;
+            text-align: center;
+            min-height: 15vh; 
+            margin-top: 20px;
         }
 
-        /* El Recorte: Conectado al borde izquierdo, irregularidades en los lados del triángulo */
-        .cutout-frame {
-            width: 100%;
-            height: 100%;
-            background-image: url('https://i.pinimg.com/736x/45/5a/2d/455a2d65ae98c00af4733bc2a34e323b.jpg');
-            background-size: cover;
-            background-position: center;
-            
-            /* Clip-path: Base plana a la izquierda (0%), rasgado en los lados inclinados */
-            clip-path: polygon(
-                0% 0%, 
-                0% 100%, 
-                25% 92%, 35% 85%, 45% 78%, 55% 72%, 65% 68%, 75% 62%, 85% 58%, 95% 52%, 100% 50%,
-                95% 48%, 85% 42%, 75% 38%, 65% 32%, 55% 28%, 45% 22%, 35% 15%, 25% 8%
-            );
-            position: relative;
-        }
-
-        /* Botón ENTRAR: Blanco con efecto de movimiento de color interno */
-        .enter-button {
-            background: linear-gradient(
-                120deg, 
-                #ffffff 0%, 
-                #ffffff 40%, 
-                #a0a0a0 50%, 
-                #ffffff 60%, 
-                #ffffff 100%
-            );
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            font-size: 1.8rem;
-            font-weight: 900;
-            letter-spacing: 0.6em;
+        /* Frase Analogica */
+        .pain-quote {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.9rem;
+            color: rgba(200, 200, 200, 0.8);
+            letter-spacing: 0.15em;
             text-transform: uppercase;
-            cursor: pointer;
-            border: none;
-            padding: 10px;
-            filter: drop-shadow(0 0 8px rgba(255,255,255,0.4));
-            animation: textShine 3s linear infinite, float 3s ease-in-out infinite;
-            transition: transform 0.3s ease;
+            position: relative;
+            margin-top: 10px;
+            text-shadow: 2px 0 rgba(255, 0, 0, 0.7), -2px 0 rgba(0, 255, 255, 0.7);
+            animation: analog-glitch 5s infinite alternate;
         }
 
-        .enter-button:hover {
-            transform: scale(1.1);
-            filter: drop-shadow(0 0 12px rgba(255,255,255,0.9));
+        @keyframes analog-glitch {
+            0% { opacity: 0.9; transform: skewX(0deg); }
+            20% { opacity: 0.9; transform: skewX(0deg); }
+            21% { opacity: 0.6; transform: skewX(-10deg); }
+            22% { opacity: 0.9; transform: skewX(0deg); }
+            100% { opacity: 0.8; }
         }
 
-        @keyframes textShine {
-            to { background-position: 200% center; }
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-
-        /* --- CONTENIDO PRINCIPAL --- */
-        #main-content {
-            opacity: 0;
-            transition: opacity 1.5s ease;
-            height: 100vh;
+        /* --- GRID DE MONITORES --- */
+        .grid-container {
+            flex-grow: 1;
             display: flex;
             align-items: center;
             justify-content: center;
+            width: 100%;
+            overflow: visible;
+            z-index: 10;
+            padding-bottom: 20px;
         }
 
-        .vertical-text {
-            writing-mode: vertical-rl;
-            text-orientation: mixed;
-            font-family: 'Noto Sans JP', sans-serif;
-            background: linear-gradient(90deg, #fcfcfc 0%, #9c9695 15%, #fcfcfc 30%, #9c9695 45%, #fcfcfc 60%, #9c9695 75%, #ffe3ef 90%, #9c9695 100%);
-            background-size: 200% 200%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 12px rgba(0, 0, 1, 1));
-            animation: gradient-rotation 6s linear infinite;
+        .monitor-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            width: 85%;
+            max-width: 800px;
+            aspect-ratio: 16/9;
+            padding: 10px;
+            border: 1px solid #333;
+            background: rgba(10, 5, 20, 0.4);
+            border-radius: 8px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
         }
 
-        @keyframes flicker {
-            0%, 18%, 22%, 25%, 53%, 57%, 100% { opacity: 1; text-shadow: 0 0 4px #fff, 0 0 11px #fff; }
-            20%, 24%, 55% { opacity: 0.3; text-shadow: none; }
+        .monitor-slot {
+            position: relative;
+            background-color: #000;
+            border: 2px solid #333;
+            overflow: hidden;
+            cursor: pointer;
+            transition: border-color 0.1s;
         }
 
-        .flicker-text { animation: flicker 3s infinite; }
+        .monitor-slot.active { border-color: #8b5cf6; }
 
-        @keyframes gradient-rotation {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        .cam-label {
+            position: absolute; top: 4px; left: 4px;
+            font-size: 0.6rem; color: #0f0; background: rgba(0,0,0,0.8);
+            padding: 1px 3px; z-index: 10; pointer-events: none;
         }
 
-        .fade-target { transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), filter 0.6s ease; }
-        .container-site:has(.image-area:hover) .text-area { opacity: 0.15; filter: blur(2px); }
-        .container-site:has(.text-area:hover) .image-area { opacity: 0.25; filter: brightness(0.4); }
-
-        @media (max-width: 768px) {
-            .container-site { flex-direction: column-reverse; height: auto; }
-            .text-area, .image-area { width: 100%; height: 400px; }
+        /* --- MINI PLAYER & CONTROLS --- */
+        .bottom-panel {
+            width: 100%;
+            height: 120px;
+            background: rgba(0, 0, 0, 0.95);
+            border-top: 1px solid #4B0082;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            z-index: 50;
+            box-shadow: 0 -10px 40px rgba(75, 0, 130, 0.2);
+            flex-shrink: 0;
         }
+
+        .player-info { display: flex; align-items: center; gap: 15px; }
+        .cover-art {
+            width: 50px; height: 50px;
+            background-image: url('https://media.tenor.com/6HT7CTdweWwAAAAM/naruto-pain-pain.gif');
+            background-size: cover;
+            border: 1px solid #d0a9f5;
+            box-shadow: 0 0 10px #4B0082;
+        }
+
+        #visualizer-canvas {
+            width: 250px; height: 50px;
+            background: #000; border: 1px solid #333;
+            box-shadow: inset 0 0 10px rgba(75, 0, 130, 0.3);
+        }
+
+        /* --- MODAL (Zoom) --- */
+        #modal-view {
+            opacity: 0; pointer-events: none; transition: opacity 0.3s;
+            backdrop-filter: blur(10px);
+        }
+        #modal-view.open { opacity: 1; pointer-events: auto; }
+
+        /* --- IMAGEN FLOTANTE --- */
+        #floater {
+            position: fixed; top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            z-index: 100; pointer-events: none;
+            box-shadow: 0 0 50px rgba(139, 92, 246, 0.5);
+            border: 2px solid #fff;
+            background-size: cover; background-position: center;
+            opacity: 0;
+        }
+
+        /* CRT Scanlines */
+        .scanlines {
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,0.15));
+            background-size: 100% 3px;
+            position: fixed; inset: 0; pointer-events: none; z-index: 200;
+        }
+
+        #intro-screen.hidden-intro { opacity: 0; pointer-events: none; transition: opacity 0.8s ease-out; }
     </style>
 </head>
 <body>
 
-    <!-- PANTALLA DE INTRODUCCIÓN -->
-    <div id="intro-screen">
-        <div class="intro-card" onclick="enterSite()">
-            <!-- Recorte conectado al borde izquierdo con laterales rasgados -->
-            <div class="cutout-wrapper">
-                <div class="cutout-frame"></div>
-            </div>
-            
-            <!-- Botón Entrar (Texto Blanco con brillo animado) -->
-            <button class="enter-button">
-                ENTRAR
+    <div class="room-bg"></div>
+    <div class="scanlines"></div>
+
+    <!-- AUDIO ELEMENT (Ruta automática) -->
+    <audio id="bg-audio" src="musica.mp3" crossorigin="anonymous" loop></audio>
+
+    <!-- INTRO SCREEN -->
+    <div id="intro-screen" class="fixed inset-0 z-[300] bg-black flex flex-col items-center justify-center">
+        <!-- Título cambiado a MARVIN -->
+        <h1 class="text-6xl md:text-8xl font-[Rubik_Glitch] text-purple-600 mb-2 tracking-widest animate-pulse">MARVIN</h1>
+        <p class="text-gray-500 font-mono text-xs tracking-[0.5em] mb-8">SYSTEM OFFLINE // INITIATE SEQUENCE</p>
+        
+        <div class="flex flex-col items-center gap-4 bg-gray-900 p-8 rounded border border-purple-900 shadow-[0_0_50px_rgba(75,0,130,0.3)]">
+            <!-- Botón directo, sin carga de archivo -->
+            <button id="start-btn" onclick="startSequence()" class="border border-purple-500 bg-purple-900/20 px-8 py-4 text-purple-200 hover:bg-purple-800 hover:text-white transition-all tracking-widest text-sm font-bold uppercase cursor-pointer">
+                ¿Estás seguro de entrar?
             </button>
+            <p class="text-[10px] text-gray-500 font-mono mt-2">ACCESS GRANTED</p>
         </div>
     </div>
 
-    <!-- CONTENIDO PRINCIPAL -->
-    <main id="main-content">
-        <div class="container-site flex w-full max-w-5xl h-[75vh] bg-black shadow-[0_0_80px_rgba(0,0,0,1)] overflow-hidden border border-white/10">
-            
-            <!-- Sección de Texto (Izquierda) -->
-            <div class="text-area fade-target w-1/2 flex flex-col relative p-8 md:p-14 bg-black">
-                <div class="absolute right-6 top-8">
-                    <h2 class="vertical-text text-5xl md:text-7xl font-bold tracking-tighter">
-                        ライトブラウン
-                    </h2>
-                </div>
+    <!-- SECTION: HEADER -->
+    <div class="header-section">
+        <!-- MARVIN: Estilo Simple Glitch como Panopticon -->
+        <h1 class="text-6xl md:text-8xl font-[Rubik_Glitch] text-purple-600 mb-4 tracking-widest animate-pulse">
+            MARVIN
+        </h1>
+        
+        <!-- FRASE ANALÓGICA -->
+        <div class="pain-quote">
+            ''Siente el dolor. Piensa en el dolor. Acepta el dolor. Conoce el dolor.''
+        </div>
+    </div>
 
-                <div class="mt-auto relative z-10">
-                    <h1 class="flicker-text text-6xl md:text-8xl font-bold mb-3 tracking-tighter leading-none">
-                        Beige
-                    </h1>
-                    <div class="h-[1px] w-16 bg-white/40 mb-6"></div>
-                    <div class="space-y-4">
-                        <p class="text-3xl font-light tracking-[0.4em] text-white/90">444</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Sección de Imagen (Derecha) -->
-            <div class="image-area fade-target w-1/2 h-full overflow-hidden">
-                <img 
-                    src="https://xatimg.com/image/tMLjMikLMclC.jpg" 
-                    alt="Imagen Principal" 
-                    class="w-full h-full object-cover"
-                >
+    <!-- SECTION: GRID -->
+    <div class="grid-container">
+        <div class="monitor-grid" id="main-grid">
+            <!-- Fila 1 -->
+            <div id="slot-0" class="monitor-slot" onclick="openModal(this)"><span class="cam-label">CAM_01</span></div>
+            <div id="slot-1" class="monitor-slot" onclick="openModal(this)"><span class="cam-label">CAM_02</span></div>
+            <div id="slot-2" class="monitor-slot" onclick="openModal(this)"><span class="cam-label">CAM_03</span></div>
+            <!-- Fila 2 -->
+            <div id="slot-3" class="monitor-slot" onclick="openModal(this)"><span class="cam-label">CAM_04</span></div>
+            <div id="slot-4" class="monitor-slot" onclick="openModal(this)"><span class="cam-label">CAM_05</span></div>
+            <div id="slot-5" class="monitor-slot" onclick="openModal(this)"><span class="cam-label">CAM_06</span></div>
+            <!-- Fila 3 -->
+            <div id="slot-6" class="monitor-slot" onclick="openModal(this)"><span class="cam-label">CAM_07</span></div>
+            <div id="slot-7" class="monitor-slot" onclick="openModal(this)"><span class="cam-label">CAM_08</span></div>
+            <!-- Slot Error -->
+            <div id="slot-8" class="monitor-slot error flex items-center justify-center">
+                <span class="cam-label text-red-500">CAM_09 // ERR</span>
+                <span class="text-red-600 font-bold text-xs animate-pulse tracking-widest">NO SIGNAL</span>
             </div>
         </div>
-    </main>
+    </div>
+
+    <!-- SECTION: BOTTOM PLAYER -->
+    <div class="bottom-panel">
+        <div class="player-info">
+            <div class="cover-art"></div>
+            <div class="flex flex-col">
+                <span class="text-[10px] text-purple-400 font-bold tracking-wider">REPRODUCIENDO</span>
+                <!-- Nombre de la canción actualizado -->
+                <span class="text-xs text-white font-mono" id="song-title">𝘿𝙀𝘼𝙏𝙃 𝙍𝘼𝙏𝙏𝙇𝙀 - 𝙐𝙇𝙏𝙍𝘼 𝙎𝙇𝙊𝙒𝙀𝘿 𝙑𝙀𝙍𝙎𝙄𝙊𝙉</span>
+            </div>
+        </div>
+        
+        <!-- VISUALIZADOR REAL -->
+        <div class="flex flex-col items-center">
+             <span class="text-[8px] text-gray-500 mb-1 tracking-[0.3em] uppercase">Analizador de Frecuencia</span>
+             <canvas id="visualizer-canvas"></canvas>
+        </div>
+
+        <div class="text-right hidden md:block">
+             <div class="text-xs text-purple-300 font-mono" id="time-display">00:00</div>
+             <div class="text-[8px] text-gray-500 tracking-widest">SYSTEM: ONLINE</div>
+        </div>
+    </div>
+
+    <!-- MODAL & FLOATER -->
+    <div id="modal-view" class="fixed inset-0 z-[250] bg-black/90 flex flex-col items-center justify-center cursor-pointer" onclick="closeModal()">
+        <div id="modal-img" class="w-[80vw] h-[60vh] bg-contain bg-no-repeat bg-center border border-purple-900 shadow-[0_0_50px_rgba(139,92,246,0.2)]"></div>
+        <div class="mt-4 text-xs text-gray-500 animate-pulse">CLICK TO CLOSE</div>
+    </div>
+
+    <div id="floater">
+        <div class="absolute bottom-2 left-2 bg-red-600 text-white text-[10px] px-2 py-0.5 font-bold animate-pulse">LIVE FEED</div>
+    </div>
 
     <script>
-        function enterSite() {
-            const intro = document.getElementById('intro-screen');
-            const main = document.getElementById('main-content');
+        // --- CONFIGURACIÓN ---
+        const images = [
+            "https://i.ibb.co/cKbBZvCw/8.jpg",
+            "https://i.ibb.co/TB9yprYv/7.jpg",
+            "https://i.ibb.co/tT6ggDWr/6.jpg",
+            "https://i.ibb.co/zhz2LJx7/5.jpg",
+            "https://i.ibb.co/spYb1pv3/4.jpg",
+            "https://i.ibb.co/5WzQQvNR/3.jpg",
+            "https://i.ibb.co/rfvmJKwH/2.jpg",
+            "https://i.ibb.co/r24HGX2S/Whats-App-Image-2026-01-19-at-11-31-24-PM.jpg"
+        ];
+
+        // Elementos DOM
+        const audio = document.getElementById('bg-audio');
+        const canvas = document.getElementById('visualizer-canvas');
+        const ctx = canvas.getContext('2d');
+        const floater = document.getElementById('floater');
+        
+        // Variables de Audio
+        let audioContext, analyser, dataArray, source;
+        let isAudioSetup = false;
+        let currentIndex = 0;
+        let bassLevel = 1; 
+
+        // 2. INICIAR SISTEMA (Simplificado)
+        function startSequence() {
+            if (!isAudioSetup) {
+                setupAudio();
+                isAudioSetup = true;
+            }
             
-            intro.style.opacity = '0';
+            // Intentar reproducir (requiere que musica.mp3 exista en la raíz)
+            audio.play().catch(e => {
+                console.log("No se encontró musica.mp3 o error de reproducción:", e);
+                // Si falla (por ej, no hay archivo en este entorno demo), el sistema visual sigue funcionando
+            });
+
+            document.getElementById('intro-screen').classList.add('hidden-intro');
+            
+            renderVisualizer();
+            setTimeout(nextImage, 1000);
+        }
+
+        function setupAudio() {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioContext.createAnalyser();
+            source = audioContext.createMediaElementSource(audio);
+            
+            source.connect(analyser);
+            analyser.connect(audioContext.destination);
+            
+            analyser.fftSize = 128;
+            const bufferLength = analyser.frequencyBinCount;
+            dataArray = new Uint8Array(bufferLength);
+        }
+
+        // 3. RENDERIZADO VISUAL REACTIVO
+        function renderVisualizer() {
+            requestAnimationFrame(renderVisualizer);
+            if(!analyser) return;
+
+            analyser.getByteFrequencyData(dataArray);
+
+            // A) Limpiar Canvas
+            ctx.fillStyle = '#050505';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // B) Dibujar Barras
+            const barWidth = (canvas.width / dataArray.length) * 1.5;
+            let barHeight;
+            let x = 0;
+
+            let bassSum = 0;
+            let bassCount = 0;
+
+            for(let i = 0; i < dataArray.length; i++) {
+                barHeight = (dataArray[i] / 255) * canvas.height;
+
+                // Color dinámico
+                const r = 139 + (i * 2); 
+                const g = 92 + (i * 2);
+                const b = 246;
+
+                ctx.fillStyle = `rgb(${r},${g},${b})`;
+                ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
+
+                x += barWidth + 1;
+
+                // Capturar graves (frecuencias bajas)
+                if (i < 8) {
+                    bassSum += dataArray[i];
+                    bassCount++;
+                }
+            }
+
+            // C) Aplicar Efectos Reactivos al DOM
+            const avgBass = bassSum / bassCount; 
+            
+            // Factor de escala (0 a 1 -> 1.0 a 1.08)
+            const scaleFactor = 1 + (avgBass / 255) * 0.08; 
+            bassLevel = scaleFactor;
+
+            // Animar monitores activos
+            const activeMonitors = document.querySelectorAll('.monitor-slot.active');
+            activeMonitors.forEach(mon => {
+                mon.style.transform = `scale(${scaleFactor})`;
+                
+                mon.style.borderColor = avgBass > 190 ? '#fff' : '#8b5cf6';
+                mon.style.boxShadow = `0 0 ${avgBass/8}px rgba(139, 92, 246, ${avgBass/200})`;
+                mon.style.zIndex = avgBass > 200 ? '50' : '10';
+            });
+            
+            // Texto reactivo
+            if (avgBass > 180) {
+                 document.querySelector('.pain-quote').style.color = "rgba(255,255,255,0.9)";
+            } else {
+                 document.querySelector('.pain-quote').style.color = "rgba(200,200,200,0.8)";
+            }
+
+            updateTime();
+        }
+
+        // 4. SECUENCIA DE IMÁGENES
+        function nextImage() {
+            if (currentIndex >= images.length) {
+                floater.style.display = 'none';
+                return;
+            }
+
+            const imgUrl = images[currentIndex];
+            const targetSlot = document.getElementById(`slot-${currentIndex}`);
+
+            if (!targetSlot) return; 
+
+            // RESET
+            floater.style.transition = 'none';
+            floater.style.top = '50%';
+            floater.style.left = '50%';
+            floater.style.width = '30vw'; floater.style.height = '22.5vw';
+            floater.style.transform = 'translate(-50%, -50%) scale(0.5)';
+            floater.style.backgroundImage = `url('${imgUrl}')`;
+            floater.style.opacity = '0';
+            
+            void floater.offsetWidth;
+
+            // POP IN
+            floater.style.transition = 'opacity 0.2s ease-in, transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+            floater.style.opacity = '1';
+            floater.style.transform = `translate(-50%, -50%) scale(${1.2 * bassLevel})`;
+
+            // WAIT
             setTimeout(() => {
-                intro.style.visibility = 'hidden';
-                main.style.opacity = '1';
-                document.body.style.overflow = 'auto';
-            }, 800);
+                moveToSlot(targetSlot, imgUrl);
+            }, 1500);
+        }
+
+        function moveToSlot(slot, url) {
+            const rect = slot.getBoundingClientRect();
+            const targetTop = rect.top + rect.height / 2;
+            const targetLeft = rect.left + rect.width / 2;
+
+            floater.style.transition = 'all 0.6s ease-in-out';
+            floater.style.width = `${rect.width}px`;
+            floater.style.height = `${rect.height}px`;
+            floater.style.top = `${targetTop}px`;
+            floater.style.left = `${targetLeft}px`;
+            floater.style.transform = 'translate(-50%, -50%) scale(1)';
+            
+            setTimeout(() => {
+                floater.style.opacity = '0';
+                slot.style.backgroundImage = `url('${url}')`;
+                slot.style.backgroundSize = 'cover';
+                slot.style.backgroundPosition = 'center';
+                slot.classList.add('active');
+                slot.dataset.fullImg = url;
+
+                currentIndex++;
+                setTimeout(nextImage, 300);
+            }, 600);
+        }
+
+        // UTILIDADES
+        function updateTime() {
+            const cur = audio.currentTime;
+            const min = Math.floor(cur / 60);
+            const sec = Math.floor(cur % 60);
+            document.getElementById('time-display').innerText = 
+                `${min.toString().padStart(2,'0')}:${sec.toString().padStart(2,'0')}`;
+        }
+
+        function openModal(el) {
+            if (!el.classList.contains('active')) return;
+            const modal = document.getElementById('modal-view');
+            document.getElementById('modal-img').style.backgroundImage = `url('${el.dataset.fullImg}')`;
+            modal.classList.add('open');
+        }
+        function closeModal() {
+            document.getElementById('modal-view').classList.remove('open');
         }
     </script>
-
 </body>
 </html>
